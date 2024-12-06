@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		938C59672D02E0F100883F60 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 938C59662D02E0F100883F60 /* SnapKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		938C59482D02E05400883F60 /* Book-Tok1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Book-Tok1.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				938C59672D02E0F100883F60 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,12 +77,14 @@
 			buildRules = (
 			);
 			dependencies = (
+				938C596A2D02E10700883F60 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				938C594A2D02E05400883F60 /* Book-Tok1 */,
 			);
 			name = "Book-Tok1";
 			packageProductDependencies = (
+				938C59662D02E0F100883F60 /* SnapKit */,
 			);
 			productName = "Book-Tok1";
 			productReference = 938C59482D02E05400883F60 /* Book-Tok1.app */;
@@ -107,6 +114,10 @@
 			);
 			mainGroup = 938C593F2D02E05400883F60;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				938C59652D02E0F100883F60 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				938C59682D02E0FE00883F60 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 938C59492D02E05400883F60 /* Products */;
 			projectDirPath = "";
@@ -136,6 +147,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		938C596A2D02E10700883F60 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 938C59692D02E10700883F60 /* SwiftLintBuildToolPlugin */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		938C595C2D02E05500883F60 /* Debug */ = {
@@ -333,6 +351,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		938C59652D02E0F100883F60 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+		938C59682D02E0FE00883F60 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.57.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		938C59662D02E0F100883F60 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 938C59652D02E0F100883F60 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		938C59692D02E10700883F60 /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 938C59682D02E0FE00883F60 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 938C59402D02E05400883F60 /* Project object */;
 }
