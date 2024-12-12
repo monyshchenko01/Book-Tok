@@ -1,7 +1,7 @@
 import UIKit
 import SnapKit
 
-class CommentsViewController: UIViewController, UITableViewDataSource {
+class CommentsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     var comments: [String] = []
 
     private let tableView: UITableView = {
@@ -35,6 +35,7 @@ class CommentsViewController: UIViewController, UITableViewDataSource {
         super.viewDidLoad()
         view.backgroundColor = .white
         tableView.dataSource = self
+        tableView.delegate = self
         submitButton.addTarget(self, action: #selector(addComment), for: .touchUpInside)
         setupView()
     }
@@ -86,6 +87,17 @@ class CommentsViewController: UIViewController, UITableViewDataSource {
         cell.layer.cornerRadius = 10
         cell.clipsToBounds = true
         return cell
+    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let alert = UIAlertController(title: "Delete Comment",
+                                      message: "Do you want to delete this comment?",
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+            self.comments.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+        }))
+        present(alert, animated: true, completion: nil)
     }
 
     @objc private func addComment() {
