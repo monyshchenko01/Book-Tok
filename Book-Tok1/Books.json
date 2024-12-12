@@ -1,0 +1,32 @@
+[
+  {
+    "comments" : [
+
+    ],
+    "author" : "George Orwell",
+    "isLiked" : true,
+    "genre" : "Dystopian",
+    "title" : "1984",
+    "image" : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6DLAgYoesxsBWzXWlZIYQ7miMS9CVC73HGfbrndqXM_BaBYjPof0ilYiEtBDfC5gz-Po&usqp=CAU"
+  },
+  {
+    "isLiked" : true,
+    "image" : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcRvm2_DLM5B7GAGltEMVMVeBgvSOmgR6I7ZzzN7xr0_CrUo3Yp7WKSz6UFxemwR4qeG8&usqp=CAU",
+    "title" : "To Kill a Mockingbird",
+    "comments" : [
+
+    ],
+    "author" : "Harper Lee",
+    "genre" : "Fiction"
+  },
+  {
+    "genre" : "Classic",
+    "isLiked" : true,
+    "comments" : [
+
+    ],
+    "title" : "The Great Gatsby",
+    "author" : "F. Scott Fitzgerald",
+    "image" : "https://m.media-amazon.com/images/I/81QuEGw8VPL._AC_UF894,1000_QL80_.jpg"
+  }
+]

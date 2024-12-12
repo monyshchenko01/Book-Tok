@@ -1,10 +1,3 @@
-//
-//  Coordinator.swift
-//  Book-Tok1
-//
-//  Created by Matvii Onyshchenko on 06.12.2024.
-//
-
 import UIKit
 
 class Coordinator {
@@ -14,8 +7,21 @@ class Coordinator {
         self.navigationController = rootViewController
     }
     func start() {
-        let commentsViewController = CommentsViewController()
-        navigationController.viewControllers = [// тут буде перший контролер]
+        let tabBarController = UITabBarController()
+        let mainBooksViewController = UIViewController()
+        mainBooksViewController.tabBarItem = UITabBarItem(
+            title: "Home",
+            image: UIImage(systemName: "house"),
+            tag: 0
+        )
+        let likedBooksViewController = LikedBooksViewController()
+                likedBooksViewController.tabBarItem = UITabBarItem(
+                    title: "Liked Books",
+                    image: UIImage(systemName: "heart.circle"),
+                    tag: 1
+                )
+        tabBarController.viewControllers = [mainBooksViewController, likedBooksViewController]
+        navigationController.viewControllers = [tabBarController]
     }
 
 }
