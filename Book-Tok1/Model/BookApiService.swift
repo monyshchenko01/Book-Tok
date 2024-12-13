@@ -12,7 +12,7 @@ private enum APIEndpoint {
     static let apiKey = "" // DO NOT COMMIT YOUR API KEY TO SOURCE CONTROL.
 }
 
-final class GoogleBooksAPIService {
+final class BookAPIService {
     private var cancellable = Set<AnyCancellable>()
 
     func fetchRandomBook() -> AnyPublisher<Book, Error> {
