@@ -6,13 +6,18 @@
 //
 import Foundation
 
+struct ImageLinks: Decodable {
+    let smallThumbnail: String?
+    let thumbnail: String?
+}
+
 struct Book : Decodable {
     let title: String
     let authors: [String]?
     let description: String?
     let categories: [String]?
     let averageRating: Double?
-    let coverURL: String?
+    let imageLinks: ImageLinks?
 }
 
 struct GoogleBooksResponse: Decodable {
