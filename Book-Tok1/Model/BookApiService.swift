@@ -5,6 +5,7 @@
 //  Created by Kira Zholtikova on 10.12.2024.
 //
 import Foundation
+import UIKit
 import Combine
 
 private enum APIEndpoint {
@@ -26,8 +27,8 @@ final class BookAPIService {
         components.queryItems = [
             URLQueryItem(name: "q", value: randomLetter),
             URLQueryItem(name: "key", value: APIEndpoint.apiKey),
-            URLQueryItem(name: "startIndex", value: "\(Int.random(in: 0...550))"),
-            URLQueryItem(name: "maxResults", value: "50")
+            URLQueryItem(name: "startIndex", value: "\(Int.random(in: 0...510))"),
+            URLQueryItem(name: "maxResults", value: "40")
         ]
 
         guard let url = components.url else {
@@ -44,8 +45,18 @@ final class BookAPIService {
                 guard let randomVolume = items.randomElement() else {
                     throw URLError(.resourceUnavailable)
                 }
+                
                 return randomVolume.volumeInfo
             }
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
+    
+    func fetchImage(at url: URL) -> AnyPublisher<UIImage?, Error> {
+        URLSession.shared.dataTaskPublisher(for: url)
+            .map(\.data)
+            .map { UIImage(data: $0) }
+            .mapError { $0 as Error }
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
