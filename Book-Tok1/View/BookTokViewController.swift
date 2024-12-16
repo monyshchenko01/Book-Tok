@@ -41,11 +41,15 @@ final class BookTokViewController: UIViewController {
         return label
     }()
     
-//    private let categoriesStack: UIStackView = {
-//        let stackView = UIStackView()
-//        
-//        return stackView
-//    }()
+    private let categoriesStack: UIStackView = {
+        let stackView = UIStackView()
+        
+        stackView.axis = .horizontal
+        stackView.spacing = 5
+        stackView.distribution = .fill
+        
+        return stackView
+    }()
     
     private let ratingView: UIStackView = {
         let stackView = UIStackView()
@@ -139,6 +143,7 @@ final class BookTokViewController: UIViewController {
         view.addSubview(coverImageView)
         view.addSubview(textOverlay)
         view.addSubview(titleLabel)
+        view.addSubview(categoriesStack)
         view.addSubview(ratingView)
         view.addSubview(descriptionLabel)
         view.addSubview(buttonsStack)
@@ -172,7 +177,7 @@ final class BookTokViewController: UIViewController {
         descriptionLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(10)
             $0.bottom.equalTo(buttonsStack.snp.top).offset(-30)
-            $0.height.lessThanOrEqualTo(view.snp.height).multipliedBy(0.3)
+            $0.height.lessThanOrEqualTo(view.snp.height).multipliedBy(0.25)
         }
         
         ratingView.snp.makeConstraints {
@@ -180,9 +185,14 @@ final class BookTokViewController: UIViewController {
             $0.bottom.equalTo(descriptionLabel.snp.top).offset(-15)
         }
         
+        categoriesStack.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview().inset(10)
+            $0.bottom.equalTo(ratingView.snp.top).offset(-5)
+        }
+        
         titleLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(10)
-            $0.bottom.equalTo(ratingView.snp.top).offset(-15)
+            $0.bottom.equalTo(categoriesStack.snp.top).offset(-15)
         }
     }
     
@@ -196,6 +206,7 @@ final class BookTokViewController: UIViewController {
                 
                 self?.view.layoutIfNeeded()
                 self?.setupGradient()
+                self?.setupCategories(book?.categories)
                 self?.setupRating(book?.averageRating)
                 
                 self?.viewModel.fetchCurrentBookCoverImage()
@@ -303,6 +314,32 @@ final class BookTokViewController: UIViewController {
             starImageView.heightAnchor.constraint(equalToConstant: 30).isActive = true
             
             ratingView.addArrangedSubview(starImageView)
+        }
+    }
+    
+    private func setupCategories(_ categories: [String]?) {
+        guard let categories = categories, !categories.isEmpty else {
+            categoriesStack.isHidden = true
+            return
+        }
+        categoriesStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        categoriesStack.isHidden = false
+        
+        for i in 0..<min(categories.count, 3) {
+            let categoryLabel = UILabel()
+            categoryLabel.text = categories[i]
+            categoryLabel.font = .systemFont(ofSize: 14, weight: .semibold)
+            categoryLabel.textColor = .white
+            categoryLabel.textAlignment = .center
+            
+            categoryLabel.setContentHuggingPriority(.required, for: .horizontal)
+            categoryLabel.setContentHuggingPriority(.required, for: .vertical)
+            
+            categoryLabel.backgroundColor = .blue
+            categoryLabel.layer.cornerRadius = 15
+            categoryLabel.layer.masksToBounds = true
+            
+            categoriesStack.addArrangedSubview(categoryLabel)
         }
     }
 

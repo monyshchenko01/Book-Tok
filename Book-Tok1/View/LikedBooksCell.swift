@@ -10,7 +10,7 @@ class BookCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupViews()
-        setupGradientBackground()  
+        setupGradientBackground()
     }
     
     required init?(coder: NSCoder) {
@@ -54,7 +54,7 @@ class BookCell: UITableViewCell {
         gradientLayer.frame = contentView.bounds
         gradientLayer.colors = [
             UIColor.lightGray.cgColor,
-            UIColor.darkGray.cgColor 
+            UIColor.darkGray.cgColor
         ]
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 0)
         gradientLayer.endPoint = CGPoint(x: 1, y: 1)
