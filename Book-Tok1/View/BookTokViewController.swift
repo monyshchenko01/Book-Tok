@@ -20,8 +20,15 @@ final class BookTokViewController: UIViewController {
         return imageView
     }()
     
-//    private let dark
+    private let textOverlay: UIView = {
+        let overlay = UIView()
+        
+        overlay.clipsToBounds = true
+        
+        return overlay
+    }()
     
+    private let gradientLayer = CAGradientLayer()
 //    private let rating
     
     private let titleLabel: UILabel = {
@@ -105,8 +112,14 @@ final class BookTokViewController: UIViewController {
         viewModel.fetchRandomBook()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        gradientLayer.frame = textOverlay.bounds
+    }
+    
     private func setupView() {
         view.addSubview(coverImageView)
+        view.addSubview(textOverlay)
         view.addSubview(titleLabel)
         view.addSubview(descriptionLabel)
         view.addSubview(buttonsContainer)
@@ -121,7 +134,12 @@ final class BookTokViewController: UIViewController {
     
     private func setupLayout() {
         coverImageView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.edges.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        textOverlay.snp.makeConstraints {
+            $0.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.top.equalTo(titleLabel.snp.top).offset(-100)
         }
         
         buttonsContainer.snp.makeConstraints {
@@ -146,7 +164,7 @@ final class BookTokViewController: UIViewController {
         descriptionLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(10)
             $0.bottom.equalTo(buttonsContainer.snp.top).offset(-30)
-            $0.height.lessThanOrEqualTo(view.snp.height).multipliedBy(0.5)
+            $0.height.lessThanOrEqualTo(view.snp.height).multipliedBy(0.4)
         }
         
         titleLabel.snp.makeConstraints {
@@ -161,6 +179,8 @@ final class BookTokViewController: UIViewController {
                 self?.titleLabel.text = book?.title
                 self?.descriptionLabel.text = book?.description
                 self?.authorButton.isHidden = book?.authors?.isEmpty ?? true
+                self?.view.layoutIfNeeded()
+                self?.setupGradient()
                 self?.viewModel.fetchCurrentBookCoverImage()
             }
             .store(in: &viewModel.cancellables)
@@ -199,6 +219,22 @@ final class BookTokViewController: UIViewController {
         }
 
         present(commentsVC, animated: true)
+    }
+    
+    private func setupGradient() {
+        textOverlay.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
+
+        gradientLayer.colors = [
+            UIColor.black.withAlphaComponent(1).cgColor,
+            UIColor.clear.cgColor
+        ]
+        gradientLayer.locations = [0.0, 1.0]
+        gradientLayer.startPoint = CGPoint(x: 0.5, y: 1.0)
+        gradientLayer.endPoint = CGPoint(x: 0.5, y: 0.0)
+
+        gradientLayer.frame = textOverlay.bounds
+
+        textOverlay.layer.insertSublayer(gradientLayer, at: 0)
     }
 
 }
