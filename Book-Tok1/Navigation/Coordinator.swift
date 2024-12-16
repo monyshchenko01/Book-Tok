@@ -17,10 +17,10 @@ class Coordinator {
         let bookTokViewModel = BookTokViewModel(bookAPIservice: bookAPIService)
         let bookTokViewController = BookTokViewController(viewModel: bookTokViewModel)
         bookTokViewController.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house.fill"), tag: 0)
-        let likedBooksViewController = LikedBooksViewController()
-        likedBooksViewController.tabBarItem = UITabBarItem(title: "Liked Books", image: UIImage(systemName: "heart.circle"), tag: 1)
+//        let likedBooksViewController = LikedBooksViewController()
+//        likedBooksViewController.tabBarItem = UITabBarItem(title: "Liked Books", image: UIImage(systemName: "heart.circle"), tag: 1)
         
-        tabBarController.viewControllers = [bookTokViewController, likedBooksViewController]
+        tabBarController.viewControllers = [bookTokViewController]
         navigationController.pushViewController(tabBarController, animated: false)
         
         window.rootViewController = navigationController

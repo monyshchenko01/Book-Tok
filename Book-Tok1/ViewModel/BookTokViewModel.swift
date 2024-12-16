@@ -5,12 +5,14 @@
 //  Created by Kira Zholtikova on 13.12.2024.
 //
 import Foundation
+import CoreData
 import UIKit
 import Combine
 
 final class BookTokViewModel {
     private var bookSubject = CurrentValueSubject<Book?, Never>(nil)
     private let bookImageSubject = CurrentValueSubject<UIImage?, Never>(nil)
+    private let isLikedSubject = CurrentValueSubject<Bool, Never>(false)
 
     private let bookAPIservice: BookAPIService
     var cancellables = Set<AnyCancellable>()
@@ -21,6 +23,10 @@ final class BookTokViewModel {
     
     var bookImagePublisher: AnyPublisher<UIImage?, Never> {
         bookImageSubject.eraseToAnyPublisher()
+    }
+    
+    var isLikedPublished: AnyPublisher<Bool, Never> {
+        isLikedSubject.eraseToAnyPublisher()
     }
 
     init(bookAPIservice: BookAPIService) {
@@ -33,9 +39,11 @@ final class BookTokViewModel {
             .sink { [weak self] completion in
                 if case .failure = completion {
                     self?.bookSubject.send(nil)
+                    self?.isLikedSubject.send(false)
                 }
             } receiveValue: { [weak self] book in
                 self?.bookSubject.send(book)
+                self?.isLikedSubject.send(self?.findBook(book) != nil)
             }
             .store(in: &cancellables)
     }
@@ -53,31 +61,53 @@ final class BookTokViewModel {
                self?.bookImageSubject.send(image)
            })
            .store(in: &cancellables)
-   }
+    }
     
-    func likeBook() {
+    private func findBook(_ book: Book) -> BookEntity? {
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let fetchRequest: NSFetchRequest<BookEntity> = BookEntity.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "title == %@", book.title)
+        
+        do {
+            let results = try context.fetch(fetchRequest)
+            return results.first
+        } catch {
+            return nil
+        }
+    }
+    
+    func updateLikedStatus() {
         guard let currentBook = bookSubject.value else { return }
         
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-
-        let bookEntity = BookEntity(context: context)
-        bookEntity.title = currentBook.title
-        bookEntity.authors = currentBook.authors
-        bookEntity.bookDescription = currentBook.description
-        bookEntity.categories = currentBook.categories
-        bookEntity.averageRating = currentBook.averageRating ?? 0.0
-
-        if let imageLinks = currentBook.imageLinks {
-            let imageLinksEntity = ImageLinksEntity(context: context)
-            imageLinksEntity.smallThumbnail = imageLinks.smallThumbnail
-            imageLinksEntity.thumbnail = imageLinks.thumbnail
-            bookEntity.imageLinks = imageLinksEntity
+        
+        if let existingBookEntity = findBook(currentBook) {
+            context.delete(existingBookEntity)
+            isLikedSubject.send(false)
+            print("Book '\(currentBook.title)' unliked")
+        } else {
+            let bookEntity = BookEntity(context: context)
+            bookEntity.title = currentBook.title
+            bookEntity.authors = currentBook.authors
+            bookEntity.bookDescription = currentBook.description
+            bookEntity.categories = currentBook.categories
+            bookEntity.averageRating = currentBook.averageRating ?? 0.0
+            
+            if let imageLinks = currentBook.imageLinks {
+                let imageLinksEntity = ImageLinksEntity(context: context)
+                imageLinksEntity.smallThumbnail = imageLinks.smallThumbnail
+                imageLinksEntity.thumbnail = imageLinks.thumbnail
+                bookEntity.imageLinks = imageLinksEntity
+            }
+            
+            isLikedSubject.send(true)
+            print("Book '\(currentBook.title)' liked")
         }
-
+        
         do {
             try context.save()
         } catch {
-            print("Failed to save book: \(error)")
+            print("Failed to toggle liked status: \(error)")
         }
     }
     

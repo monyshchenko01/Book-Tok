@@ -68,6 +68,7 @@ final class BookTokViewController: UIViewController {
         button.setImage(UIImage(systemName: "heart.circle.fill"), for: .normal)
         button.setContentHuggingPriority(.required, for: .horizontal)
         button.setContentCompressionResistancePriority(.required, for: .horizontal)
+//        button.tintColor = .white
         button.imageView?.contentMode = .scaleAspectFit
         button.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 40, weight: .bold, scale: .large), forImageIn: .normal)
         button.accessibilityIdentifier = "likeButton"
@@ -116,7 +117,7 @@ final class BookTokViewController: UIViewController {
         
 //        authorButton.addTarget(self, action: #selector(didTapAuthorButton), for: .touchUpInside)
         likeButton.addTarget(self, action: #selector(didTapLikeButton), for: .touchUpInside)
-//        commentsButton.addTarget(self, action: #selector(didTapCommentsButton), for: .touchUpInside)
+        commentsButton.addTarget(self, action: #selector(didTapCommentsButton), for: .touchUpInside)
     }
     
     private func setupLayout() {
@@ -166,10 +167,28 @@ final class BookTokViewController: UIViewController {
                 self?.coverImageView.image = image
             }
             .store(in: &viewModel.cancellables)
+        
+        viewModel.isLikedPublished
+            .sink { [weak self] isLiked in
+                self?.likeButton.tintColor = isLiked ? .systemPink : .white
+            }
+            .store(in: &viewModel.cancellables)
     }
     
     @objc private func didTapLikeButton() {
-        self.likeButton.tintColor = .systemPink
-        viewModel.likeBook()
+        viewModel.updateLikedStatus()
     }
+    
+    @objc private func didTapCommentsButton() {
+        let commentsVC = CommentsViewController()
+        commentsVC.modalPresentationStyle = .pageSheet
+
+        if let sheet = commentsVC.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.prefersGrabberVisible = true
+        }
+
+        present(commentsVC, animated: true)
+    }
+
 }
