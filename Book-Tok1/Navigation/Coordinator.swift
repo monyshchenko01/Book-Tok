@@ -1,10 +1,3 @@
-//
-//  Coordinator.swift
-//  Book-Tok1
-//
-//  Created by Matvii Onyshchenko on 06.12.2024.
-//
-
 import UIKit
 
 class Coordinator {
@@ -20,14 +13,14 @@ class Coordinator {
     
     func start() {
         let tabBarController = UITabBarController()
-        
+
         let bookTokViewModel = BookTokViewModel(bookAPIservice: bookAPIService)
         let bookTokViewController = BookTokViewController(viewModel: bookTokViewModel)
-        bookTokViewController.tabBarItem = UITabBarItem(title: "", image: UIImage(systemName: "house.fill"), tag: 0)
+        bookTokViewController.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house.fill"), tag: 0)
+        let likedBooksViewController = LikedBooksViewController()
+        likedBooksViewController.tabBarItem = UITabBarItem(title: "Liked Books", image: UIImage(systemName: "heart.circle"), tag: 1)
         
-        let commentsViewController = CommentsViewController()
-        
-        tabBarController.viewControllers = [bookTokViewController]
+        tabBarController.viewControllers = [bookTokViewController, likedBooksViewController]
         navigationController.pushViewController(tabBarController, animated: false)
         
         window.rootViewController = navigationController
