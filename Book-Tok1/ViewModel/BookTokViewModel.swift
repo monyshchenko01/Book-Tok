@@ -11,6 +11,7 @@ import Combine
 final class BookTokViewModel {
     private var bookSubject = CurrentValueSubject<Book?, Never>(nil)
     private let bookImageSubject = CurrentValueSubject<UIImage?, Never>(nil)
+
     private let bookAPIservice: BookAPIService
     var cancellables = Set<AnyCancellable>()
     
@@ -57,11 +58,26 @@ final class BookTokViewModel {
     func likeBook() {
         guard let currentBook = bookSubject.value else { return }
         
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+
+        let bookEntity = BookEntity(context: context)
+        bookEntity.title = currentBook.title
+        bookEntity.authors = currentBook.authors
+        bookEntity.bookDescription = currentBook.description
+        bookEntity.categories = currentBook.categories
+        bookEntity.averageRating = currentBook.averageRating ?? 0.0
+
+        if let imageLinks = currentBook.imageLinks {
+            let imageLinksEntity = ImageLinksEntity(context: context)
+            imageLinksEntity.smallThumbnail = imageLinks.smallThumbnail
+            imageLinksEntity.thumbnail = imageLinks.thumbnail
+            bookEntity.imageLinks = imageLinksEntity
+        }
+
         do {
-//            try context.save()
-            print("Книга '\(currentBook.title)' додана до лайкнутих!")
+            try context.save()
         } catch {
-            print("Помилка при додаванні книги: \(error)")
+            print("Failed to save book: \(error)")
         }
     }
     

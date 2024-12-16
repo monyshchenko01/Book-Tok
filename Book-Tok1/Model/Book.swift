@@ -18,6 +18,7 @@ struct Book : Decodable {
     let categories: [String]?
     let averageRating: Double?
     let imageLinks: ImageLinks?
+    var isLiked = false
 }
 
 struct GoogleBooksResponse: Decodable {

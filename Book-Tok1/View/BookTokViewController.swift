@@ -20,6 +20,10 @@ final class BookTokViewController: UIViewController {
         return imageView
     }()
     
+//    private let dark
+    
+//    private let rating
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
         
@@ -30,6 +34,8 @@ final class BookTokViewController: UIViewController {
         
         return label
     }()
+    
+//    private let categoriesContainer
     
     private let descriptionLabel: UILabel = {
         let label = UILabel()
@@ -62,7 +68,6 @@ final class BookTokViewController: UIViewController {
         button.setImage(UIImage(systemName: "heart.circle.fill"), for: .normal)
         button.setContentHuggingPriority(.required, for: .horizontal)
         button.setContentCompressionResistancePriority(.required, for: .horizontal)
-        button.tintColor = .white
         button.imageView?.contentMode = .scaleAspectFit
         button.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 40, weight: .bold, scale: .large), forImageIn: .normal)
         button.accessibilityIdentifier = "likeButton"
@@ -109,7 +114,9 @@ final class BookTokViewController: UIViewController {
         view.addSubview(likeButton)
         view.addSubview(commentsButton)
         
-        view.backgroundColor = .darkGray
+//        authorButton.addTarget(self, action: #selector(didTapAuthorButton), for: .touchUpInside)
+        likeButton.addTarget(self, action: #selector(didTapLikeButton), for: .touchUpInside)
+//        commentsButton.addTarget(self, action: #selector(didTapCommentsButton), for: .touchUpInside)
     }
     
     private func setupLayout() {
@@ -159,5 +166,10 @@ final class BookTokViewController: UIViewController {
                 self?.coverImageView.image = image
             }
             .store(in: &viewModel.cancellables)
+    }
+    
+    @objc private func didTapLikeButton() {
+        self.likeButton.tintColor = .systemPink
+        viewModel.likeBook()
     }
 }
