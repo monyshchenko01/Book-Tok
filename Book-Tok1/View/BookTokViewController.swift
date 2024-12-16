@@ -48,16 +48,19 @@ final class BookTokViewController: UIViewController {
         return label
     }()
     
+    private let buttonsContainer: UIView = {
+        let view = UIView()
+        return view
+    }()
+    
     private let authorButton: UIButton = {
         let button = UIButton()
         
         button.setImage(UIImage(systemName: "person.circle.fill"), for: .normal)
-        button.setContentHuggingPriority(.required, for: .horizontal)
-        button.setContentCompressionResistancePriority(.required, for: .horizontal)
         button.tintColor = .white
         button.imageView?.contentMode = .scaleAspectFit
         button.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 40, weight: .bold, scale: .large), forImageIn: .normal)
-        button.accessibilityIdentifier = "likeButton"
+        button.accessibilityIdentifier = "authorButton"
         
         return button
     }()
@@ -66,9 +69,6 @@ final class BookTokViewController: UIViewController {
         let button = UIButton()
         
         button.setImage(UIImage(systemName: "heart.circle.fill"), for: .normal)
-        button.setContentHuggingPriority(.required, for: .horizontal)
-        button.setContentCompressionResistancePriority(.required, for: .horizontal)
-//        button.tintColor = .white
         button.imageView?.contentMode = .scaleAspectFit
         button.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 40, weight: .bold, scale: .large), forImageIn: .normal)
         button.accessibilityIdentifier = "likeButton"
@@ -80,12 +80,10 @@ final class BookTokViewController: UIViewController {
         let button = UIButton()
         
         button.setImage(UIImage(systemName: "bubble.circle.fill"), for: .normal)
-        button.setContentHuggingPriority(.required, for: .horizontal)
-        button.setContentCompressionResistancePriority(.required, for: .horizontal)
         button.tintColor = .white
         button.imageView?.contentMode = .scaleAspectFit
         button.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 40, weight: .bold, scale: .large), forImageIn: .normal)
-        button.accessibilityIdentifier = "likeButton"
+        button.accessibilityIdentifier = "commentsButton"
         
         return button
     }()
@@ -111,39 +109,43 @@ final class BookTokViewController: UIViewController {
         view.addSubview(coverImageView)
         view.addSubview(titleLabel)
         view.addSubview(descriptionLabel)
-        view.addSubview(authorButton)
-        view.addSubview(likeButton)
-        view.addSubview(commentsButton)
+        view.addSubview(buttonsContainer)
+        buttonsContainer.addSubview(authorButton)
+        buttonsContainer.addSubview(likeButton)
+        buttonsContainer.addSubview(commentsButton)
         
-//        authorButton.addTarget(self, action: #selector(didTapAuthorButton), for: .touchUpInside)
+        authorButton.addTarget(self, action: #selector(didTapAuthorButton), for: .touchUpInside)
         likeButton.addTarget(self, action: #selector(didTapLikeButton), for: .touchUpInside)
         commentsButton.addTarget(self, action: #selector(didTapCommentsButton), for: .touchUpInside)
     }
     
     private func setupLayout() {
         coverImageView.snp.makeConstraints {
-//            $0.edges.equalTo(view.safeAreaLayoutGuide)
             $0.edges.equalToSuperview()
         }
         
-        likeButton.snp.makeConstraints {
+        buttonsContainer.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(30)
-       }
-        
-        authorButton.snp.makeConstraints {
-            $0.centerY.equalTo(likeButton)
-            $0.trailing.equalTo(likeButton.snp.leading).offset(-15)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(50)
+            $0.height.equalTo(40)
         }
         
+        authorButton.snp.makeConstraints {
+            $0.leading.equalToSuperview()
+        }
+        
+        likeButton.snp.makeConstraints {
+            $0.leading.equalTo(authorButton.snp.trailing).offset(15)
+       }
+        
         commentsButton.snp.makeConstraints {
-            $0.centerY.equalTo(likeButton)
             $0.leading.equalTo(likeButton.snp.trailing).offset(15)
+            $0.trailing.equalToSuperview()
         }
         
         descriptionLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(10)
-            $0.bottom.equalTo(likeButton.snp.top).offset(-30)
+            $0.bottom.equalTo(buttonsContainer.snp.top).offset(-30)
             $0.height.lessThanOrEqualTo(view.snp.height).multipliedBy(0.5)
         }
         
@@ -158,6 +160,7 @@ final class BookTokViewController: UIViewController {
             .sink { [weak self] book in
                 self?.titleLabel.text = book?.title
                 self?.descriptionLabel.text = book?.description
+                self?.authorButton.isHidden = book?.authors?.isEmpty ?? true
                 self?.viewModel.fetchCurrentBookCoverImage()
             }
             .store(in: &viewModel.cancellables)
@@ -173,6 +176,13 @@ final class BookTokViewController: UIViewController {
                 self?.likeButton.tintColor = isLiked ? .systemPink : .white
             }
             .store(in: &viewModel.cancellables)
+    }
+    
+    @objc private func didTapAuthorButton() {
+        guard let author = viewModel.getAuthor() else { return }
+//        let authorVM = AuthorViewModel(name: author)
+        let authorVC = UIViewController() // change to author tab
+        navigationController?.pushViewController(authorVC, animated: true)
     }
     
     @objc private func didTapLikeButton() {

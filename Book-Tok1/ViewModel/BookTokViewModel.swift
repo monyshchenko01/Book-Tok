@@ -84,7 +84,6 @@ final class BookTokViewModel {
         if let existingBookEntity = findBook(currentBook) {
             context.delete(existingBookEntity)
             isLikedSubject.send(false)
-            print("Book '\(currentBook.title)' unliked")
         } else {
             let bookEntity = BookEntity(context: context)
             bookEntity.title = currentBook.title
@@ -101,7 +100,6 @@ final class BookTokViewModel {
             }
             
             isLikedSubject.send(true)
-            print("Book '\(currentBook.title)' liked")
         }
         
         do {
@@ -111,11 +109,9 @@ final class BookTokViewModel {
         }
     }
     
-    func openComments() {
+    func getAuthor() -> String? {
+        guard let currentBook = bookSubject.value else { return nil }
         
-    }
-    
-    func goToAuthor() {
-        
+        return currentBook.authors?.first
     }
 }
