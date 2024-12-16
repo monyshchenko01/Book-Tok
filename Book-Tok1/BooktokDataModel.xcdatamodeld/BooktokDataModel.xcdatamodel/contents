@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23507" systemVersion="23F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="BookEntity" representedClassName="BookEntity" syncable="YES">
+        <attribute name="authors" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData"/>
+        <attribute name="averageRating" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="bookDescription" optional="YES" attributeType="String"/>
+        <attribute name="categories" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData"/>
+        <attribute name="coverURL" optional="YES" attributeType="String"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <relationship name="imageLinks" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ImageLinksEntity" inverseName="book" inverseEntity="ImageLinksEntity"/>
+        <relationship name="relationship" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CommentsEntity" inverseName="relationship" inverseEntity="CommentsEntity"/>
+    </entity>
+    <entity name="CommentsEntity" representedClassName="CommentsEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="comment" optional="YES" attributeType="String"/>
+        <relationship name="relationship" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BookEntity" inverseName="relationship" inverseEntity="BookEntity"/>
+    </entity>
+    <entity name="ImageLinksEntity" representedClassName="ImageLinksEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="smallThumbnail" optional="YES" attributeType="String"/>
+        <attribute name="thumbnail" optional="YES" attributeType="String"/>
+        <relationship name="book" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BookEntity" inverseName="imageLinks" inverseEntity="BookEntity"/>
+    </entity>
+</model>
