@@ -29,7 +29,6 @@ final class BookTokViewController: UIViewController {
     }()
     
     private let gradientLayer = CAGradientLayer()
-//    private let rating
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -42,7 +41,21 @@ final class BookTokViewController: UIViewController {
         return label
     }()
     
-//    private let categoriesContainer
+    private let categoriesStack: UIStackView = {
+        let stackView = UIStackView()
+        
+        return stackView
+    }()
+    
+    private let ratingView: UIStackView = {
+        let stackView = UIStackView()
+        
+        stackView.axis = .horizontal
+        stackView.spacing = 5
+        stackView.distribution = .fill
+        
+        return stackView
+    }()
     
     private let descriptionLabel: UILabel = {
         let label = UILabel()
@@ -55,9 +68,14 @@ final class BookTokViewController: UIViewController {
         return label
     }()
     
-    private let buttonsContainer: UIView = {
-        let view = UIView()
-        return view
+    private let buttonsStack: UIStackView = {
+        let stackView = UIStackView()
+        
+        stackView.axis = .horizontal
+        stackView.spacing = 15
+        stackView.distribution = .fill
+        
+        return stackView
     }()
     
     private let authorButton: UIButton = {
@@ -66,7 +84,7 @@ final class BookTokViewController: UIViewController {
         button.setImage(UIImage(systemName: "person.circle.fill"), for: .normal)
         button.tintColor = .white
         button.imageView?.contentMode = .scaleAspectFit
-        button.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 40, weight: .bold, scale: .large), forImageIn: .normal)
+        button.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 45, weight: .bold, scale: .large), forImageIn: .normal)
         button.accessibilityIdentifier = "authorButton"
         
         return button
@@ -77,7 +95,7 @@ final class BookTokViewController: UIViewController {
         
         button.setImage(UIImage(systemName: "heart.circle.fill"), for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
-        button.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 40, weight: .bold, scale: .large), forImageIn: .normal)
+        button.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 45, weight: .bold, scale: .large), forImageIn: .normal)
         button.accessibilityIdentifier = "likeButton"
         
         return button
@@ -89,7 +107,7 @@ final class BookTokViewController: UIViewController {
         button.setImage(UIImage(systemName: "bubble.circle.fill"), for: .normal)
         button.tintColor = .white
         button.imageView?.contentMode = .scaleAspectFit
-        button.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 40, weight: .bold, scale: .large), forImageIn: .normal)
+        button.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 45, weight: .bold, scale: .large), forImageIn: .normal)
         button.accessibilityIdentifier = "commentsButton"
         
         return button
@@ -121,11 +139,12 @@ final class BookTokViewController: UIViewController {
         view.addSubview(coverImageView)
         view.addSubview(textOverlay)
         view.addSubview(titleLabel)
+        view.addSubview(ratingView)
         view.addSubview(descriptionLabel)
-        view.addSubview(buttonsContainer)
-        buttonsContainer.addSubview(authorButton)
-        buttonsContainer.addSubview(likeButton)
-        buttonsContainer.addSubview(commentsButton)
+        view.addSubview(buttonsStack)
+        buttonsStack.addArrangedSubview(authorButton)
+        buttonsStack.addArrangedSubview(likeButton)
+        buttonsStack.addArrangedSubview(commentsButton)
         
         authorButton.addTarget(self, action: #selector(didTapAuthorButton), for: .touchUpInside)
         likeButton.addTarget(self, action: #selector(didTapLikeButton), for: .touchUpInside)
@@ -139,37 +158,27 @@ final class BookTokViewController: UIViewController {
         
         textOverlay.snp.makeConstraints {
             $0.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
-            $0.top.equalTo(titleLabel.snp.top).offset(-100)
         }
         
-        buttonsContainer.snp.makeConstraints {
+        buttonsStack.snp.makeConstraints {
             $0.centerX.equalToSuperview()
             $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(50)
-            $0.height.equalTo(40)
-        }
-        
-        authorButton.snp.makeConstraints {
-            $0.leading.equalToSuperview()
-        }
-        
-        likeButton.snp.makeConstraints {
-            $0.leading.equalTo(authorButton.snp.trailing).offset(15)
-       }
-        
-        commentsButton.snp.makeConstraints {
-            $0.leading.equalTo(likeButton.snp.trailing).offset(15)
-            $0.trailing.equalToSuperview()
         }
         
         descriptionLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(10)
-            $0.bottom.equalTo(buttonsContainer.snp.top).offset(-30)
+            $0.bottom.equalTo(buttonsStack.snp.top).offset(-30)
             $0.height.lessThanOrEqualTo(view.snp.height).multipliedBy(0.4)
+        }
+        
+        ratingView.snp.makeConstraints {
+            $0.leading.equalToSuperview().inset(10)
+            $0.bottom.equalTo(descriptionLabel.snp.top).offset(-15)
         }
         
         titleLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(10)
-            $0.bottom.equalTo(descriptionLabel.snp.top).offset(-15)
+            $0.bottom.equalTo(ratingView.snp.top).offset(-15)
         }
     }
     
@@ -179,8 +188,11 @@ final class BookTokViewController: UIViewController {
                 self?.titleLabel.text = book?.title
                 self?.descriptionLabel.text = book?.description
                 self?.authorButton.isHidden = book?.authors?.isEmpty ?? true
+                
                 self?.view.layoutIfNeeded()
                 self?.setupGradient()
+                self?.setupRating(book?.averageRating)
+                
                 self?.viewModel.fetchCurrentBookCoverImage()
             }
             .store(in: &viewModel.cancellables)
@@ -234,7 +246,38 @@ final class BookTokViewController: UIViewController {
 
         gradientLayer.frame = textOverlay.bounds
 
+        textOverlay.topAnchor.constraint(equalTo: titleLabel.topAnchor, constant: -100).isActive = true
         textOverlay.layer.insertSublayer(gradientLayer, at: 0)
+    }
+    
+    private func setupRating(_ rating: Double?) {
+        guard let rating = rating else {
+            ratingView.isHidden = true
+            return
+        }
+        ratingView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        ratingView.isHidden = false
+        
+        let maxRating = 5
+        let fullStars = Int(rating)
+        let halfStars = rating - Double(fullStars) >= 0.5 ? 1 : 0
+        let emptyStars = maxRating - fullStars - halfStars
+        
+        addStars(type: "star.fill", count: fullStars)
+        addStars(type: "star.leadinghalf.fill", count: halfStars)
+        addStars(type: "star", count: emptyStars)
+    }
+    
+    private func addStars(type: String, count: Int) {
+        for _ in 0..<count {
+            let starImageView = UIImageView(image: UIImage(systemName: type))
+            starImageView.tintColor = .systemYellow
+            starImageView.translatesAutoresizingMaskIntoConstraints = false
+            starImageView.widthAnchor.constraint(equalToConstant: 30).isActive = true
+            starImageView.heightAnchor.constraint(equalToConstant: 30).isActive = true
+            
+            ratingView.addArrangedSubview(starImageView)
+        }
     }
 
 }
