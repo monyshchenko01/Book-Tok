@@ -41,11 +41,11 @@ final class BookTokViewController: UIViewController {
         return label
     }()
     
-    private let categoriesStack: UIStackView = {
-        let stackView = UIStackView()
-        
-        return stackView
-    }()
+//    private let categoriesStack: UIStackView = {
+//        let stackView = UIStackView()
+//        
+//        return stackView
+//    }()
     
     private let ratingView: UIStackView = {
         let stackView = UIStackView()
@@ -149,6 +149,10 @@ final class BookTokViewController: UIViewController {
         authorButton.addTarget(self, action: #selector(didTapAuthorButton), for: .touchUpInside)
         likeButton.addTarget(self, action: #selector(didTapLikeButton), for: .touchUpInside)
         commentsButton.addTarget(self, action: #selector(didTapCommentsButton), for: .touchUpInside)
+        
+        let swipeUpGesture = UISwipeGestureRecognizer(target: self, action: #selector(didSwipeUp))
+       swipeUpGesture.direction = .up
+       view.addGestureRecognizer(swipeUpGesture)
     }
     
     private func setupLayout() {
@@ -168,7 +172,7 @@ final class BookTokViewController: UIViewController {
         descriptionLabel.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(10)
             $0.bottom.equalTo(buttonsStack.snp.top).offset(-30)
-            $0.height.lessThanOrEqualTo(view.snp.height).multipliedBy(0.4)
+            $0.height.lessThanOrEqualTo(view.snp.height).multipliedBy(0.3)
         }
         
         ratingView.snp.makeConstraints {
@@ -186,6 +190,7 @@ final class BookTokViewController: UIViewController {
         viewModel.bookPublisher
             .sink { [weak self] book in
                 self?.titleLabel.text = book?.title
+                self?.descriptionLabel.isHidden = book?.description?.isEmpty ?? true
                 self?.descriptionLabel.text = book?.description
                 self?.authorButton.isHidden = book?.authors?.isEmpty ?? true
                 
@@ -194,6 +199,7 @@ final class BookTokViewController: UIViewController {
                 self?.setupRating(book?.averageRating)
                 
                 self?.viewModel.fetchCurrentBookCoverImage()
+                self?.animateContentIn()
             }
             .store(in: &viewModel.cancellables)
         
@@ -232,6 +238,26 @@ final class BookTokViewController: UIViewController {
 
         present(commentsVC, animated: true)
     }
+    
+    @objc private func didSwipeUp() {
+        animateContentOut()
+        viewModel.fetchRandomBook()
+    }
+    
+    private func animateContentOut() {
+        UIView.animate(withDuration: 0.3, animations: {
+            self.view.transform = CGAffineTransform(translationX: 0, y: -self.view.frame.height)
+        })
+    }
+    
+    private func animateContentIn() {
+        self.view.transform = CGAffineTransform(translationX: 0, y: self.view.frame.height)
+        
+        UIView.animate(withDuration: 0.3) {
+            self.view.transform = CGAffineTransform(translationX: 0, y: 0)
+        }
+    }
+
     
     private func setupGradient() {
         textOverlay.layer.sublayers?.filter { $0 is CAGradientLayer }.forEach { $0.removeFromSuperlayer() }
