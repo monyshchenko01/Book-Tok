@@ -1,4 +1,5 @@
 import UIKit
+import Combine
 import CoreData
 import SnapKit
 
@@ -6,15 +7,19 @@ class LikedBooksViewController: UIViewController, UITableViewDataSource, UITable
     private var viewModel = LikedBooksViewModel()
     private let tableView = UITableView()
     private let titleLabel = UILabel()
+    private var cancellables = Set<AnyCancellable>()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupGradientBackground()
         setupView()
         setupLayout()
-        viewModel.reloadData = { [weak self] in
-            self?.tableView.reloadData()
-        }
+        viewModel.$likedBooks
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.tableView.reloadData()
+            }
+            .store(in: &cancellables)
         viewModel.loadBooks()
     }
 
@@ -26,7 +31,7 @@ class LikedBooksViewController: UIViewController, UITableViewDataSource, UITable
         titleLabel.numberOfLines = 1
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.register(BookCell.self, forCellReuseIdentifier: BookCell.reuseIdentifier)
+        tableView.register(LikedBookCell.self, forCellReuseIdentifier: LikedBookCell.reuseIdentifier)
         tableView.separatorStyle = .none
         tableView.backgroundColor = .clear
     }
@@ -55,15 +60,15 @@ class LikedBooksViewController: UIViewController, UITableViewDataSource, UITable
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.getLikedBooks().count
+        return viewModel.likedBooks.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: BookCell.reuseIdentifier,
-                                                       for: indexPath) as? BookCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: LikedBookCell.reuseIdentifier,
+                                                       for: indexPath) as? LikedBookCell else {
             fatalError("Unable to dequeue BookCell")
         }
-        let book = viewModel.getLikedBooks()[indexPath.row]
+        let book = viewModel.likedBooks[indexPath.row]
         cell.configure(with: book)
         return cell
     }
@@ -71,5 +76,4 @@ class LikedBooksViewController: UIViewController, UITableViewDataSource, UITable
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 160
     }
-
 }
