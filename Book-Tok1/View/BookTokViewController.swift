@@ -11,9 +11,9 @@ import Combine
 final class BookTokViewController: UIViewController {
     private let viewModel: BaseBookTokViewModel
     
-    private let bookInfoView = BookInfoView()
+    let bookInfoView = BookInfoView()
     
-    private let coverImageView: UIImageView = {
+    let coverImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
@@ -47,7 +47,7 @@ final class BookTokViewController: UIViewController {
         return button
     }()
     
-    private let likeButton: UIButton = {
+    let likeButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "heart.circle.fill"), for: .normal)
         button.imageView?.contentMode = .scaleAspectFit
@@ -157,18 +157,18 @@ final class BookTokViewController: UIViewController {
             .store(in: &viewModel.cancellables)
     }
     
-    @objc private func didTapAuthorButton() {
+    @objc func didTapAuthorButton() {
         guard let author = viewModel.getAuthor() else { return }
         let authorViewModel = AuthorViewModel(author: author, bookAPIservice: self.viewModel.bookAPIservice)
         let authorViewController = AuthorViewController(viewModel: authorViewModel)
         navigationController?.pushViewController(authorViewController, animated: true)
     }
     
-    @objc private func didTapLikeButton() {
+    @objc func didTapLikeButton() {
         viewModel.updateLikedStatus()
     }
     
-    @objc private func didTapCommentsButton() {
+    @objc func didTapCommentsButton() {
         if !viewModel.isLikedSubject.value {
             viewModel.updateLikedStatus()
         }
@@ -191,27 +191,27 @@ final class BookTokViewController: UIViewController {
         present(commentsVC, animated: true)
     }
     
-    @objc private func didSwipeUp() {
+    @objc func didSwipeUp() {
         if viewModel.isSwipeUpAllowed() {
             animateContentOut()
             viewModel.nextBook()
         }
     }
     
-    @objc private func didSwipeDown() {
+    @objc func didSwipeDown() {
         if viewModel.isSwipeDownAllowed() {
             animateContentOut()
             viewModel.previousBook()
         }
     }
     
-    private func animateContentOut() {
+    func animateContentOut() {
         UIView.animate(withDuration: 0.3, animations: {
             self.view.transform = CGAffineTransform(translationX: 0, y: -self.view.frame.height)
         })
     }
     
-    private func animateContentIn() {
+    func animateContentIn() {
         self.view.transform = CGAffineTransform(translationX: 0, y: self.view.frame.height)
         UIView.animate(withDuration: 0.3) {
             self.view.transform = CGAffineTransform(translationX: 0, y: 0)

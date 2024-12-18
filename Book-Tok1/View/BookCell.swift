@@ -3,8 +3,8 @@ import SnapKit
 
 class BookCell: UITableViewCell {
     static let reuseIdentifier = "BookCell"
-    private let bookImageView = UIImageView()
-    private let titleLabel = UILabel()
+    let bookImageView = UIImageView()
+    let titleLabel = UILabel()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)

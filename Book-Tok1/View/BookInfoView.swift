@@ -10,7 +10,7 @@ import SnapKit
 
 final class BookInfoView : UIView {
     
-    private let titleLabel: UILabel = {
+    let titleLabel: UILabel = {
         let label = UILabel()
         
         label.font = .systemFont(ofSize: 24, weight: .heavy)
@@ -21,7 +21,7 @@ final class BookInfoView : UIView {
         return label
     }()
     
-    private let categoryLabel: UILabel = {
+    let categoryLabel: UILabel = {
         let categoryLabel = UILabel()
         
         categoryLabel.font = .systemFont(ofSize: 14, weight: .semibold)
@@ -35,7 +35,7 @@ final class BookInfoView : UIView {
         return categoryLabel
     }()
     
-    private let ratingView: UIStackView = {
+    let ratingView: UIStackView = {
         let stackView = UIStackView()
         
         stackView.axis = .horizontal
@@ -45,7 +45,7 @@ final class BookInfoView : UIView {
         return stackView
     }()
     
-    private let descriptionLabel: UILabel = {
+    let descriptionLabel: UILabel = {
         let label = UILabel()
         
         label.font = .systemFont(ofSize: 16, weight: .regular)
