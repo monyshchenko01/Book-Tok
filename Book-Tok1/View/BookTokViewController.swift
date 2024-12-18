@@ -229,10 +229,11 @@ final class BookTokViewController: UIViewController {
     
     @objc private func didTapAuthorButton() {
         guard let author = viewModel.getAuthor() else { return }
-//        let authorVM = AuthorViewModel(name: author)
-        let authorVC = UIViewController() // change to author tab
-        navigationController?.pushViewController(authorVC, animated: true)
+        let authorViewModel = AuthorViewModel(author: author/*, bookAPIservice: bookAPIService*/)
+        let authorViewController = AuthorViewController(/*viewModel: authorViewModel, author: author*/)
+        navigationController?.pushViewController(authorViewController, animated: true)
     }
+
     
     @objc private func didTapLikeButton() {
         viewModel.updateLikedStatus()
