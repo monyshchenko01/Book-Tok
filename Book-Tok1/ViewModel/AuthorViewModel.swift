@@ -5,14 +5,13 @@ import Combine
 final class AuthorViewModel {
     private var authorSubject = CurrentValueSubject<Author?, Never>(nil)
     private var authorImageSubject = CurrentValueSubject<UIImage?, Never>(nil)
-    var bookAPIservice: BookAPIService
-    var cancellables = Set<AnyCancellable>()
-//    private let author: Author
+    private var cancellables = Set<AnyCancellable>()
+    private let author: Author
 
-    init(/*author: Author,*/ bookAPIservice: BookAPIService) {
-//        self.author = author
-        self.bookAPIservice = bookAPIservice
+    init(author: Author) {
+        self.author = author
     }
+
     var authorPublisher: AnyPublisher<Author?, Never> {
         authorSubject.eraseToAnyPublisher()
     }
@@ -21,7 +20,7 @@ final class AuthorViewModel {
         authorImageSubject.eraseToAnyPublisher()
     }
 
-    func fetchAuthorDetails(name: String) {
+    func fetchAuthorDetails(name: String, bookAPIservice: BookAPIService) {
         bookAPIservice.fetchAuthorDetails(with: name)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
@@ -32,13 +31,13 @@ final class AuthorViewModel {
             } receiveValue: { [weak self] author in
                 self?.authorSubject.send(author)
                 if let photoURLString = author.photoURL, let photoURL = URL(string: photoURLString) {
-                    self?.fetchAuthorImage(from: photoURL)
+                    self?.fetchAuthorImage(from: photoURL, bookAPIservice: bookAPIservice)
                 }
             }
             .store(in: &cancellables)
     }
 
-    func fetchAuthorImage(from url: URL) {
+    func fetchAuthorImage(from url: URL, bookAPIservice: BookAPIService) {
         bookAPIservice.fetchImage(at: url)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
