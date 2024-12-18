@@ -79,4 +79,8 @@ extension AuthorViewController : UITableViewDelegate, UITableViewDataSource {
         cell.configure(with: books[indexPath.row], image: images[indexPath.row])
         return cell
     }
+        }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 150
+    }
 }
