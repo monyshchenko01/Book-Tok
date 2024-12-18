@@ -73,12 +73,13 @@ final class BookAPIService {
         components.queryItems = [
             URLQueryItem(name: "q", value: "inauthor:\(encodedName)"),
             URLQueryItem(name: "key", value: APIEndpoint.apiKey),
-//            URLQueryItem(name: "maxResults", value: "10")
         ]
-
+        
         guard let url = components.url else {
             return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
         }
+        
+        print(url)
 
         return URLSession.shared.dataTaskPublisher(for: url)
             .map(\.data)
