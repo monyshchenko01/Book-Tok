@@ -4,7 +4,14 @@ import CoreData
 
 class LikedBooksViewModel {
     @Published private(set) var likedBooks: [Book] = []
+    @Published private(set) var likedBooksImages: [UIImage?] = []
+    private let bookAPIservice: BookAPIService
     private var cancellables = Set<AnyCancellable>()
+    
+    init(bookAPIservice: BookAPIService) {
+        self.bookAPIservice = bookAPIservice
+    }
+    
     func loadBooks() {
         fetchBooksFromCoreData()
             .receive(on: DispatchQueue.main)
@@ -14,12 +21,31 @@ class LikedBooksViewModel {
                 }
             } receiveValue: { [weak self] books in
                 self?.likedBooks = books
+                self?.fetchImages()
             }
             .store(in: &cancellables)
+        
+       
     }
-    func addLikedBook(_ book: Book) {
-        likedBooks.append(book)
+    
+    private func fetchImages() {
+        likedBooksImages = Array(repeating: nil, count: likedBooks.count)
+        for (index, book) in likedBooks.enumerated() {
+            if let urlString = book.imageLinks?.thumbnail, let url = URL(string: urlString) {
+                bookAPIservice.fetchImage(at: url)
+                    .receive(on: DispatchQueue.main)
+                    .sink { completion in
+                        if case .failure(let error) = completion {
+                            print("Failed to fetch image: \(error)")
+                        }
+                    } receiveValue: { [weak self] image in
+                        self?.likedBooksImages[index] = image
+                    }
+                    .store(in: &cancellables)
+            }
+        }
     }
+    
     private func fetchBooksFromCoreData() -> AnyPublisher<[Book], Error> {
         Future { promise in
             guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
@@ -53,4 +79,5 @@ class LikedBooksViewModel {
         }
         .eraseToAnyPublisher()
     }
+    
 }

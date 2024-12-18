@@ -4,7 +4,7 @@ import CoreData
 import SnapKit
 
 class LikedBooksViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    private var viewModel = LikedBooksViewModel()
+    private let viewModel: LikedBooksViewModel
     private let tableView = UITableView()
     private let titleLabel = UILabel()
     private var cancellables = Set<AnyCancellable>()
@@ -15,13 +15,31 @@ class LikedBooksViewController: UIViewController, UITableViewDataSource, UITable
         setupView()
         setupLayout()
         viewModel.$likedBooks
+            .combineLatest(viewModel.$likedBooksImages)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in
+            .sink { [weak self] _, _ in
                 self?.tableView.reloadData()
             }
             .store(in: &cancellables)
+        
         viewModel.loadBooks()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewModel.loadBooks()
+    }
+
+    
+    init(viewModel: LikedBooksViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
 
     private func setupView() {
         view.addSubview(titleLabel)
@@ -31,7 +49,7 @@ class LikedBooksViewController: UIViewController, UITableViewDataSource, UITable
         titleLabel.numberOfLines = 1
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.register(LikedBookCell.self, forCellReuseIdentifier: LikedBookCell.reuseIdentifier)
+        tableView.register(BookCell.self, forCellReuseIdentifier: BookCell.reuseIdentifier)
         tableView.separatorStyle = .none
         tableView.backgroundColor = .clear
     }
@@ -64,12 +82,12 @@ class LikedBooksViewController: UIViewController, UITableViewDataSource, UITable
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: LikedBookCell.reuseIdentifier,
-                                                       for: indexPath) as? LikedBookCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: BookCell.reuseIdentifier,
+                                                       for: indexPath) as? BookCell else {
             fatalError("Unable to dequeue BookCell")
         }
         let book = viewModel.likedBooks[indexPath.row]
-        cell.configure(with: book)
+        cell.configure(with: book, image: viewModel.likedBooksImages[indexPath.row])
         return cell
     }
 

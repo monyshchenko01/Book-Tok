@@ -5,7 +5,6 @@ class BookCell: UITableViewCell {
     static let reuseIdentifier = "BookCell"
     private let bookImageView = UIImageView()
     private let titleLabel = UILabel()
-    private let authorLabel = UILabel()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -19,11 +18,8 @@ class BookCell: UITableViewCell {
     
     private func setupViews() {
         titleLabel.font = .boldSystemFont(ofSize: 16)
-        authorLabel.font = .systemFont(ofSize: 14)
-        authorLabel.textColor = .gray
         contentView.addSubview(bookImageView)
         contentView.addSubview(titleLabel)
-        contentView.addSubview(authorLabel)
         bookImageView.contentMode = .scaleAspectFill
         bookImageView.layer.cornerRadius = 16
         bookImageView.clipsToBounds = true
@@ -37,19 +33,12 @@ class BookCell: UITableViewCell {
             $0.leading.equalTo(bookImageView.snp.trailing).offset(8)
             $0.trailing.equalToSuperview().inset(8)
         }
-        authorLabel.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(4)
-            $0.leading.equalTo(bookImageView.snp.trailing).offset(8)
-            $0.trailing.equalToSuperview().inset(8)
-            $0.bottom.equalToSuperview().inset(8)
-        }
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
         
         titleLabel.text = nil
-        authorLabel.text = nil
     }
     
     private func setupGradientBackground() {
@@ -63,7 +52,6 @@ class BookCell: UITableViewCell {
 
     func configure(with book: Book, image: UIImage?) {
         titleLabel.text = book.title
-        authorLabel.text = book.authors?.joined(separator: ", ")
         
         guard let bookImage = image else {
             return bookImageView.backgroundColor = .gray
