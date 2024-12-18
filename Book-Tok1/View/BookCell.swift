@@ -12,9 +12,11 @@ class BookCell: UITableViewCell {
         setupViews()
         setupGradientBackground()
     }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     private func setupViews() {
         titleLabel.font = .boldSystemFont(ofSize: 16)
         authorLabel.font = .systemFont(ofSize: 14)
@@ -42,6 +44,14 @@ class BookCell: UITableViewCell {
             $0.bottom.equalToSuperview().inset(8)
         }
     }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        titleLabel.text = nil
+        authorLabel.text = nil
+    }
+    
     private func setupGradientBackground() {
         let gradientLayer = CAGradientLayer()
         gradientLayer.frame = contentView.bounds
@@ -51,25 +61,14 @@ class BookCell: UITableViewCell {
         contentView.layer.insertSublayer(gradientLayer, at: 0)
     }
 
-    func configure(with book: Book) {
+    func configure(with book: Book, image: UIImage?) {
         titleLabel.text = book.title
         authorLabel.text = book.authors?.joined(separator: ", ")
-        if let urlString = book.imageLinks?.thumbnail, let url = URL(string: urlString) {
-            loadImage(from: url)
-        } else if let urlString = book.imageLinks?.smallThumbnail, let url = URL(string: urlString) {
-            loadImage(from: url)
+        
+        guard let bookImage = image else {
+            return bookImageView.backgroundColor = .gray
         }
+        bookImageView.image = bookImage
     }
-
-    private func loadImage(from url: URL) {
-        DispatchQueue.global().async { [weak self] in
-            if let data = try? Data(contentsOf: url) {
-                DispatchQueue.main.async {
-                    if let image = UIImage(data: data) {
-                        self?.bookImageView.image = image
-                    }
-                }
-            }
-        }
-    }
+    
 }

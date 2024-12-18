@@ -12,12 +12,6 @@ struct ImageLinks: Decodable {
     let smallThumbnail: String?
     let thumbnail: String?
 }
-struct Author: Decodable {
-    let name: String
-    let biography: String
-    let photoURL: String?
-    let books: [Book]
-}
 
 struct Book : Decodable {
     let title: String

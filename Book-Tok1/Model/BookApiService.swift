@@ -60,7 +60,8 @@ final class BookAPIService {
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
-    func fetchAuthor(with name: String) -> AnyPublisher<Author, Error> {
+    
+    func fetchBooksFromAuthor(with name: String) -> AnyPublisher<[Book], Error> {
         let booksURL = APIEndpoint.baseURL.appendingPathComponent("volumes")
 
         guard var components = URLComponents(url: booksURL, resolvingAgainstBaseURL: true) else {
@@ -72,7 +73,7 @@ final class BookAPIService {
         components.queryItems = [
             URLQueryItem(name: "q", value: "inauthor:\(encodedName)"),
             URLQueryItem(name: "key", value: APIEndpoint.apiKey),
-            URLQueryItem(name: "maxResults", value: "10")
+//            URLQueryItem(name: "maxResults", value: "10")
         ]
 
         guard let url = components.url else {
@@ -88,16 +89,10 @@ final class BookAPIService {
                     throw URLError(.badServerResponse)
                 }
 
-                let books = items.map { $0.volumeInfo }
-                let biography = "This is a biography of \(name)."
-                let photoURL = "https://via.placeholder.com/150"
-
-                return Author(name: name, biography: biography, photoURL: photoURL, books: books)
+                return items.map { $0.volumeInfo }
             }
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
-    func fetchAuthorDetails(with name: String) -> AnyPublisher<Author, Error> {
-        return fetchAuthor(with: name)
-    }
+    
 }

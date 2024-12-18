@@ -14,14 +14,17 @@ final class BookTokViewModel {
     private let bookImageSubject = CurrentValueSubject<UIImage?, Never>(nil)
     let isLikedSubject = CurrentValueSubject<Bool, Never>(false)
 
-    private let bookAPIservice: BookAPIService
+    let bookAPIservice: BookAPIService
     var cancellables = Set<AnyCancellable>()
+    
     var bookPublisher: AnyPublisher<Book?, Never> {
         bookSubject.eraseToAnyPublisher()
     }
+    
     var bookImagePublisher: AnyPublisher<UIImage?, Never> {
         bookImageSubject.eraseToAnyPublisher()
     }
+    
     var isLikedPublished: AnyPublisher<Bool, Never> {
         isLikedSubject.eraseToAnyPublisher()
     }
@@ -29,6 +32,7 @@ final class BookTokViewModel {
     init(bookAPIservice: BookAPIService) {
         self.bookAPIservice = bookAPIservice
     }
+    
     func fetchRandomBook() {
         bookAPIservice.fetchRandomBook()
             .receive(on: DispatchQueue.main)
@@ -43,6 +47,7 @@ final class BookTokViewModel {
             }
             .store(in: &cancellables)
     }
+    
     func fetchCurrentBookCoverImage() {
         guard let coverUrl = bookSubject.value?.imageLinks?.thumbnail, let url = URL(string: coverUrl) else { return }
         bookAPIservice.fetchImage(at: url)
@@ -56,6 +61,7 @@ final class BookTokViewModel {
            })
            .store(in: &cancellables)
     }
+    
     private func findBook(_ book: Book) -> BookEntity? {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             print("Failed to get AppDelegate")
@@ -71,6 +77,7 @@ final class BookTokViewModel {
             return nil
         }
     }
+    
     func updateLikedStatus() {
         guard let currentBook = bookSubject.value else { return }
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
@@ -102,17 +109,17 @@ final class BookTokViewModel {
             print("Failed to toggle liked status: \(error)")
         }
     }
-    func getAuthor() -> Author? {
+    
+    func getAuthor() -> String? {
         guard let currentBook = bookSubject.value else { return nil }
-        if let authorName = currentBook.authors?.first {
-            return Author(name: authorName, biography: "", photoURL: nil, books: [])
-        }
-        return nil
+        return currentBook.authors?.first
     }
+    
     func currentBookEntity() -> BookEntity? {
         guard let currentBook = bookSubject.value else { return nil }
         return findBook(currentBook)
     }
+    
     func getContext() -> NSManagedObjectContext? {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             print("Failed to get AppDelegate")

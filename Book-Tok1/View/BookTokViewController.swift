@@ -184,8 +184,8 @@ final class BookTokViewController: UIViewController {
     }
     @objc private func didTapAuthorButton() {
         guard let author = viewModel.getAuthor() else { return }
-        let authorViewModel = AuthorViewModel(author: author/*, bookAPIservice: bookAPIService*/)
-        let authorViewController = AuthorViewController(/*viewModel: authorViewModel, author: author*/)
+        let authorViewModel = AuthorViewModel(author: author, bookAPIservice: self.viewModel.bookAPIservice)
+        let authorViewController = AuthorViewController(viewModel: authorViewModel)
         navigationController?.pushViewController(authorViewController, animated: true)
     }
     @objc private func didTapLikeButton() {

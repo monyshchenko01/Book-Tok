@@ -3,62 +3,68 @@ import UIKit
 import Combine
 
 final class AuthorViewModel {
-    private var authorSubject = CurrentValueSubject<Author?, Never>(nil)
-    private var authorImageSubject = CurrentValueSubject<UIImage?, Never>(nil)
-    private var cancellables = Set<AnyCancellable>()
-    private let author: Author
+    private let authorName: String
+    private var authorBooksSubject = PassthroughSubject<[Book], Never>()
+    private var authorBooksImagesSubject = PassthroughSubject<[UIImage?], Never>()
+    private let bookAPIservice: BookAPIService
+    var cancellables = Set<AnyCancellable>()
 
-    init(author: Author) {
-        self.author = author
-    }
-
-    var authorPublisher: AnyPublisher<Author?, Never> {
-        authorSubject.eraseToAnyPublisher()
+    var authorBooksPublisher: AnyPublisher<[Book], Never> {
+        authorBooksSubject.eraseToAnyPublisher()
     }
     
-    var authorImagePublisher: AnyPublisher<UIImage?, Never> {
-        authorImageSubject.eraseToAnyPublisher()
+    var authorBooksImagsePublisher: AnyPublisher<[UIImage?], Never> {
+        authorBooksImagesSubject.eraseToAnyPublisher()
+    }
+    
+    init(author: String, bookAPIservice: BookAPIService) {
+        self.authorName = author
+        self.bookAPIservice = bookAPIservice
     }
 
-    func fetchAuthorDetails(name: String, bookAPIservice: BookAPIService) {
-        bookAPIservice.fetchAuthorDetails(with: name)
+    func fetchAuthorBooks() {
+        bookAPIservice.fetchBooksFromAuthor(with: authorName)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case .failure = completion {
-                    self?.authorSubject.send(nil)
-                    self?.authorImageSubject.send(nil)
+                    self?.authorBooksSubject.send([])
                 }
-            } receiveValue: { [weak self] author in
-                self?.authorSubject.send(author)
-                if let photoURLString = author.photoURL, let photoURL = URL(string: photoURLString) {
-                    self?.fetchAuthorImage(from: photoURL, bookAPIservice: bookAPIservice)
+            } receiveValue: { [weak self] books in
+                self?.authorBooksSubject.send(books)
+            }
+            .store(in: &cancellables)
+        
+        fetchBooksImages()
+    }
+
+    func fetchBooksImages() {
+        authorBooksSubject
+            .sink { [weak self] books in
+                guard let self = self else { return }
+                
+                let authorBooksImagesPublishers = books.map { book -> AnyPublisher<UIImage?, Never> in
+                    if let urlString = book.imageLinks?.thumbnail, let url = URL(string: urlString) {
+                        return self.bookAPIservice.fetchImage(at: url)
+                            .map { $0 }
+                            .catch { _ in Just(nil) }
+                            .eraseToAnyPublisher()
+                    } else {
+                        return Just(nil).eraseToAnyPublisher()
+                    }
                 }
+                
+                Publishers.MergeMany(authorBooksImagesPublishers)
+                    .collect()
+                    .sink(receiveCompletion: { [weak self] completion in
+                        if case .failure = completion {
+                            self?.authorBooksImagesSubject.send([])
+                        }
+                    }, receiveValue: { [weak self] images in
+                        self?.authorBooksImagesSubject.send(images)
+                    })
+                    .store(in: &self.cancellables)
             }
             .store(in: &cancellables)
     }
-
-    func fetchAuthorImage(from url: URL, bookAPIservice: BookAPIService) {
-        bookAPIservice.fetchImage(at: url)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] completion in
-                if case .failure = completion {
-                    self?.authorImageSubject.send(nil)
-                }
-            } receiveValue: { [weak self] image in
-                self?.authorImageSubject.send(image)
-            }
-            .store(in: &cancellables)
-    }
-
-    func getAuthor() -> Author? {
-        return authorSubject.value
-    }
-
-    func getAuthorName() -> String {
-        return authorSubject.value?.name ?? "Unknown Author"
-    }
-
-    func getAuthorBiography() -> String {
-        return authorSubject.value?.biography ?? "Biography not available."
-    }
+    
 }
