@@ -98,4 +98,11 @@ class LikedBooksViewController: UIViewController, UITableViewDataSource, UITable
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 160
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let bookTokListViewModel = BookTokListViewModel(books: viewModel.likedBooks, images: viewModel.likedBooksImages,
+                                                        bookAPIservice: viewModel.bookAPIservice, index: indexPath.row)
+        let bookTokViewController = BookTokViewController(viewModel: bookTokListViewModel)
+        navigationController?.pushViewController(bookTokViewController, animated: true)
+    }
 }

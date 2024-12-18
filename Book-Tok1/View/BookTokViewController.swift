@@ -9,7 +9,7 @@ import SnapKit
 import Combine
 
 final class BookTokViewController: UIViewController {
-    private let viewModel: BookTokViewModel
+    private let viewModel: BaseBookTokViewModel
     
     private let bookInfoView = BookInfoView()
     
@@ -68,7 +68,7 @@ final class BookTokViewController: UIViewController {
         return button
     }()
     
-    init(viewModel: BookTokViewModel) {
+    init(viewModel: BaseBookTokViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -82,7 +82,7 @@ final class BookTokViewController: UIViewController {
         setupView()
         setupLayout()
         bindViewModel()
-        viewModel.fetchRandomBook()
+        viewModel.fetchBook()
     }
     
     override func viewDidLayoutSubviews() {
@@ -105,6 +105,9 @@ final class BookTokViewController: UIViewController {
         let swipeUpGesture = UISwipeGestureRecognizer(target: self, action: #selector(didSwipeUp))
         swipeUpGesture.direction = .up
         view.addGestureRecognizer(swipeUpGesture)
+        let swipeDownGesture = UISwipeGestureRecognizer(target: self, action: #selector(didSwipeDown))
+        swipeDownGesture.direction = .down
+        view.addGestureRecognizer(swipeDownGesture)
     }
     
     private func setupLayout() {
@@ -138,7 +141,7 @@ final class BookTokViewController: UIViewController {
                     self?.authorButton.isHidden = book.authors?.isEmpty ?? true
                 }
                 
-                self?.viewModel.fetchCurrentBookCoverImage()
+                self?.viewModel.fetchCurrentBookImage()
                 self?.animateContentIn()
             }
             .store(in: &viewModel.cancellables)
@@ -189,8 +192,17 @@ final class BookTokViewController: UIViewController {
     }
     
     @objc private func didSwipeUp() {
-        animateContentOut()
-        viewModel.fetchRandomBook()
+        if viewModel.isSwipeUpAllowed() {
+            animateContentOut()
+            viewModel.nextBook()
+        }
+    }
+    
+    @objc private func didSwipeDown() {
+        if viewModel.isSwipeDownAllowed() {
+            animateContentOut()
+            viewModel.previousBook()
+        }
     }
     
     private func animateContentOut() {

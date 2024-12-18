@@ -84,7 +84,6 @@ final class BookAPIService {
             .decode(type: GoogleBooksResponse.self, decoder: JSONDecoder())
             .tryMap { response in
                 guard let items = response.items, !items.isEmpty else {
-                    print("No books found for author: \(name)")
                     throw URLError(.badServerResponse)
                 }
 

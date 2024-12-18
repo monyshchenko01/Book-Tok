@@ -103,4 +103,11 @@ extension AuthorViewController : UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 150
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let bookTokListViewModel = BookTokListViewModel(books: books, images: images,
+                                                        bookAPIservice: viewModel.bookAPIservice, index: indexPath.row)
+        let bookTokViewController = BookTokViewController(viewModel: bookTokListViewModel)
+        navigationController?.pushViewController(bookTokViewController, animated: true)
+    }
 }

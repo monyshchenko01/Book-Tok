@@ -6,7 +6,7 @@ final class AuthorViewModel {
     private let authorName: String
     private var authorBooksSubject = PassthroughSubject<[Book], Never>()
     private var authorBooksImagesSubject = PassthroughSubject<[UIImage?], Never>()
-    private let bookAPIservice: BookAPIService
+    let bookAPIservice: BookAPIService
     var cancellables = Set<AnyCancellable>()
 
     var authorBooksPublisher: AnyPublisher<[Book], Never> {

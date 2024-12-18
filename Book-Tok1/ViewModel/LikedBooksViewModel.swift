@@ -5,7 +5,7 @@ import CoreData
 class LikedBooksViewModel {
     @Published private(set) var likedBooks: [Book] = []
     @Published private(set) var likedBooksImages: [UIImage?] = []
-    private let bookAPIservice: BookAPIService
+    let bookAPIservice: BookAPIService
     private var cancellables = Set<AnyCancellable>()
     
     init(bookAPIservice: BookAPIService) {
