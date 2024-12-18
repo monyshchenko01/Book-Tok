@@ -6,7 +6,6 @@
 //
 import Foundation
 import UIKit
-import CoreData
 import Combine
 
 private enum APIEndpoint {
@@ -96,51 +95,5 @@ final class BookAPIService {
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
-    
-    func fetchBooksFromCoreData() -> AnyPublisher<[Book], Error> {
-        Deferred {
-            Future { promise in
-                DispatchQueue.main.async {
-                    guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-                        promise(.failure(NSError(domain: "CoreDataError", code: 0, userInfo: nil)))
-                        return
-                    }
-                    
-                    let context = appDelegate.persistentContainer.viewContext
-                    let fetchRequest: NSFetchRequest<BookEntity> = BookEntity.fetchRequest()
-                    
-                    DispatchQueue.global(qos: .background).async {
-                        do {
-                            let bookEntities = try context.fetch(fetchRequest)
-                            let books = bookEntities.map { entity in
-                                Book(
-                                    title: entity.title ?? "Untitled",
-                                    authors: entity.authors,
-                                    description: entity.bookDescription,
-                                    categories: entity.categories,
-                                    averageRating: entity.averageRating,
-                                    imageLinks: entity.imageLinks.flatMap { imageEntity in
-                                        ImageLinks(
-                                            smallThumbnail: imageEntity.smallThumbnail,
-                                            thumbnail: imageEntity.thumbnail
-                                        )
-                                    }
-                                )
-                            }
-                            DispatchQueue.main.async {
-                                promise(.success(books))
-                            }
-                        } catch {
-                            DispatchQueue.main.async {
-                                promise(.failure(error))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        .eraseToAnyPublisher()
-    }
-
     
 }
