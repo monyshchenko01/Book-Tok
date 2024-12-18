@@ -13,7 +13,7 @@ final class AuthorViewModel {
         authorBooksSubject.eraseToAnyPublisher()
     }
     
-    var authorBooksImagsePublisher: AnyPublisher<[UIImage?], Never> {
+    var authorBooksImagesPublisher: AnyPublisher<[UIImage?], Never> {
         authorBooksImagesSubject.eraseToAnyPublisher()
     }
     

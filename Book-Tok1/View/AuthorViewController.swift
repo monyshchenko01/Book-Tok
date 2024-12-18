@@ -55,7 +55,7 @@ class AuthorViewController: UIViewController {
     }
     
     private func bindViewModel() {
-        Publishers.CombineLatest(viewModel.authorBooksPublisher, viewModel.authorBooksImagsePublisher)
+        Publishers.CombineLatest(viewModel.authorBooksPublisher, viewModel.authorBooksImagesPublisher)
            .sink { [weak self] books, images in
                self?.books = books
                self?.images = images

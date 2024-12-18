@@ -124,7 +124,7 @@ final class BookTokViewController: UIViewController {
         
         textOverlay.snp.makeConstraints {
             $0.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
-            $0.top.equalTo(bookInfoView.snp.top).offset(-100)
+            $0.top.equalTo(bookInfoView.snp.top).offset(-200)
         }
     }
     
@@ -219,7 +219,6 @@ final class BookTokViewController: UIViewController {
 
         gradientLayer.frame = textOverlay.bounds
 
-        textOverlay.topAnchor.constraint(equalTo: bookInfoView.topAnchor, constant: -100).isActive = true
         textOverlay.layer.insertSublayer(gradientLayer, at: 0)
     }
 
