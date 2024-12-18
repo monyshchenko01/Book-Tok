@@ -64,7 +64,7 @@ class LikedBooksViewController: UIViewController, UITableViewDataSource, UITable
         tableView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(30)
             $0.leading.trailing.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(30)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(30)
         }
     }
 
@@ -72,10 +72,11 @@ class LikedBooksViewController: UIViewController, UITableViewDataSource, UITable
         let gradientLayer = CAGradientLayer()
         gradientLayer.frame = view.bounds
         gradientLayer.colors = [
-            UIColor.black.withAlphaComponent(1).cgColor,
-            UIColor.white.cgColor
-        ]
-        gradientLayer.locations = [0.0, 1.0]
+                UIColor.black.cgColor,
+                UIColor.white.cgColor,
+                UIColor.black.cgColor
+            ]
+        gradientLayer.locations = [0.0, 0.5, 1.0]
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.0)
         gradientLayer.endPoint = CGPoint(x: 0.5, y: 1.0)
         view.layer.insertSublayer(gradientLayer, at: 0)

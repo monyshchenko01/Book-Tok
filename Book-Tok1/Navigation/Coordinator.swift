@@ -12,8 +12,7 @@ class Coordinator {
     }
     func start() {
         let tabBarController = UITabBarController()
-        tabBarController.tabBar.barTintColor = .white
-        tabBarController.tabBar.isTranslucent = false
+        
         let bookTokViewModel = BookTokViewModel(bookAPIservice: bookAPIService)
         let bookTokViewController = BookTokViewController(viewModel: bookTokViewModel)
         bookTokViewController.tabBarItem = UITabBarItem(title: "", image: UIImage(systemName: "house.fill"), tag: 0)
