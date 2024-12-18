@@ -11,25 +11,18 @@ class AuthorViewController: UIViewController, UITableViewDataSource, UITableView
     private let tableView = UITableView()
     
     private var cancellables = Set<AnyCancellable>()
-//    private let bookAPIService: BookAPIService
-    private let author: Author
-    private let viewModel: AuthorViewModel
-    
-    init(viewModel: AuthorViewModel/*, bookAPIService: BookAPIService*/, author: Author) {
-        self.viewModel = viewModel
-        self.author = author
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    private var viewModel: AuthorViewModel?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-//        fetchAuthorDetails()
+        bindViewModel()
     }
+    
+    func configure(with viewModel: AuthorViewModel) {
+        self.viewModel = viewModel
+    }
+    
     private func setupUI() {
         view.backgroundColor = .white
         nameLabel.font = .boldSystemFont(ofSize: 20)
@@ -83,16 +76,28 @@ class AuthorViewController: UIViewController, UITableViewDataSource, UITableView
             make.leading.trailing.bottom.equalToSuperview()
         }
     }
-//    private func fetchAuthorDetails() {
-//        viewModel.fetchAuthorDetails(name: author.name)
-//        viewModel.authorPublisher
-//            .sink { [weak self] _ in
-//                self?.updateUI()
-//            }
-//            .store(in: &cancellables)
-//    }
+    
+    private func bindViewModel() {
+        viewModel?.authorPublisher
+            .sink { [weak self] author in
+                self?.nameLabel.text = author?.name ?? "Unknown Author"
+                self?.bioLabel.isHidden = author?.biography.isEmpty ?? true
+                self?.bioLabel.text = author?.biography
+                self?.photoImageView.isHidden = author?.photoURL?.isEmpty ?? true
+                
+                self?.view.layoutIfNeeded()
+            }
+            .store(in: &cancellables)
+        
+        viewModel?.authorImagePublisher
+            .sink { [weak self] image in
+                self?.photoImageView.image = image
+            }
+            .store(in: &cancellables)
+    }
+
     private func updateUI() {
-        guard let author = viewModel.getAuthor() else { return }
+        guard let author = viewModel?.getAuthor() else { return }
         
         nameLabel.text = author.name
         bioLabel.text = author.biography
@@ -111,13 +116,13 @@ class AuthorViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.getAuthor()?.books.count ?? 0
+        return viewModel?.getAuthor()?.books.count ?? 0
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .default, reuseIdentifier: "BookCell")
         
-        if let book = viewModel.getAuthor()?.books[indexPath.row] {
+        if let book = viewModel?.getAuthor()?.books[indexPath.row] {
             let bookImageView = UIImageView()
             let titleLabel = UILabel()
             
@@ -127,7 +132,6 @@ class AuthorViewController: UIViewController, UITableViewDataSource, UITableView
             
             cell.contentView.addSubview(bookImageView)
             cell.contentView.addSubview(titleLabel)
-            
 
             bookImageView.snp.makeConstraints { make in
                 make.leading.equalToSuperview().offset(10)
@@ -146,15 +150,13 @@ class AuthorViewController: UIViewController, UITableViewDataSource, UITableView
         
         return cell
     }
-//    хз як працює, потрбвно буде перевірити
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        if let selectedBook = viewModel.getAuthor()?.books[indexPath.row] {
-            let bookDetailsViewModel = BookDetailsViewModel(book: selectedBook, coverImage: UIImage(named: "defaultBookCover"))
-            let bookDetailsVC = BookDetailsViewController(viewModel: bookDetailsViewModel)
-            navigationController?.pushViewController(bookDetailsVC, animated: true)
-        }
-    }
 
-
+//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        tableView.deselectRow(at: indexPath, animated: true)
+//        if let selectedBook = viewModel?.getAuthor()?.books[indexPath.row] {
+//            let bookDetailsViewModel = BookDetailsViewModel(book: selectedBook, coverImage: UIImage(named: "defaultBookCover"))
+//            let bookDetailsVC = BookDetailsViewController(viewModel: bookDetailsViewModel)
+//            navigationController?.pushViewController(bookDetailsVC, animated: true)
+//        }
+//    }
 }
