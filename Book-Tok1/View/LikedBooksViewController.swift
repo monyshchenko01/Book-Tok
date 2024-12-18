@@ -63,8 +63,8 @@ class LikedBooksViewController: UIViewController, UITableViewDataSource, UITable
         }
         tableView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(30)
-            make.leading.trailing.equalToSuperview()
-            make.bottom.equalToSuperview().inset(30)
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(30)
         }
     }
 
