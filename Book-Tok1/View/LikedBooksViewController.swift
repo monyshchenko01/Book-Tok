@@ -44,8 +44,10 @@ class LikedBooksViewController: UIViewController, UITableViewDataSource, UITable
     private func setupView() {
         view.addSubview(titleLabel)
         view.addSubview(tableView)
+        
         titleLabel.text = "Liked Books"
-        titleLabel.font = UIFont.boldSystemFont(ofSize: 32)
+        titleLabel.font = .systemFont(ofSize: 32, weight: .heavy)
+        titleLabel.textColor = .white
         titleLabel.numberOfLines = 1
         tableView.dataSource = self
         tableView.delegate = self
@@ -56,11 +58,11 @@ class LikedBooksViewController: UIViewController, UITableViewDataSource, UITable
 
     private func setupLayout() {
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(16)
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(15)
             $0.centerX.equalToSuperview()
         }
         tableView.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(16)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(30)
             $0.leading.trailing.bottom.equalToSuperview().inset(20)
         }
     }
@@ -69,11 +71,12 @@ class LikedBooksViewController: UIViewController, UITableViewDataSource, UITable
         let gradientLayer = CAGradientLayer()
         gradientLayer.frame = view.bounds
         gradientLayer.colors = [
-            UIColor.lightGray.cgColor,
+            UIColor.black.withAlphaComponent(1).cgColor,
             UIColor.white.cgColor
         ]
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
+        gradientLayer.locations = [0.0, 1.0]
+        gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.0)
+        gradientLayer.endPoint = CGPoint(x: 0.5, y: 1.0)
         view.layer.insertSublayer(gradientLayer, at: 0)
     }
 

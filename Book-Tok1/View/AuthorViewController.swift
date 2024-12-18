@@ -23,6 +23,7 @@ class AuthorViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupGradientBackground()
         bindViewModel()
         
         DispatchQueue.global(qos: .background).async {
@@ -31,9 +32,8 @@ class AuthorViewController: UIViewController {
     }
     
     private func setupUI() {
-        view.backgroundColor = .white
-        titleLabel.font = .boldSystemFont(ofSize: 22)
-        titleLabel.textColor = .black
+        titleLabel.font = .systemFont(ofSize: 32, weight: .heavy)
+        titleLabel.textColor = .white
         titleLabel.textAlignment = .center
         
         tableView.dataSource = self
@@ -57,11 +57,26 @@ class AuthorViewController: UIViewController {
     private func bindViewModel() {
         Publishers.CombineLatest(viewModel.authorBooksPublisher, viewModel.authorBooksImagesPublisher)
            .sink { [weak self] books, images in
+               self?.titleLabel.text = "Books from " + (self?.viewModel.getAuthor() ?? "")
+            
                self?.books = books
                self?.images = images
                self?.tableView.reloadData()
            }
            .store(in: &viewModel.cancellables)
+    }
+    
+    private func setupGradientBackground() {
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.frame = view.bounds
+        gradientLayer.colors = [
+            UIColor.black.withAlphaComponent(1).cgColor,
+            UIColor.white.cgColor
+        ]
+        gradientLayer.locations = [0.0, 1.0]
+        gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.0)
+        gradientLayer.endPoint = CGPoint(x: 0.5, y: 1.0)
+        view.layer.insertSublayer(gradientLayer, at: 0)
     }
     
 }
@@ -79,7 +94,7 @@ extension AuthorViewController : UITableViewDelegate, UITableViewDataSource {
         cell.configure(with: books[indexPath.row], image: images[indexPath.row])
         return cell
     }
-        }
+        
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 150
     }

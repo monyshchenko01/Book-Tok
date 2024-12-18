@@ -78,8 +78,6 @@ final class BookAPIService {
         guard let url = components.url else {
             return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
         }
-        
-        print(url)
 
         return URLSession.shared.dataTaskPublisher(for: url)
             .map(\.data)

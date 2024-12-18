@@ -17,6 +17,7 @@ class BookCell: UITableViewCell {
     }
     
     private func setupViews() {
+        contentView.backgroundColor = .black
         titleLabel.font = .boldSystemFont(ofSize: 16)
         contentView.addSubview(bookImageView)
         contentView.addSubview(titleLabel)
@@ -44,9 +45,9 @@ class BookCell: UITableViewCell {
     private func setupGradientBackground() {
         let gradientLayer = CAGradientLayer()
         gradientLayer.frame = contentView.bounds
-        gradientLayer.colors = [UIColor.lightGray.cgColor, UIColor.darkGray.cgColor]
-        gradientLayer.startPoint = CGPoint(x: 0.5, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
+        gradientLayer.colors = [UIColor.white.cgColor, UIColor.black.cgColor]
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
+        gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
         contentView.layer.insertSublayer(gradientLayer, at: 0)
     }
 

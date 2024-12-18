@@ -67,4 +67,8 @@ final class AuthorViewModel {
             .store(in: &cancellables)
     }
     
+    func getAuthor() -> String {
+        return authorName
+    }
+    
 }
