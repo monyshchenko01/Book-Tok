@@ -35,22 +35,27 @@ class AuthorViewController: UIViewController {
         titleLabel.font = .systemFont(ofSize: 32, weight: .heavy)
         titleLabel.textColor = .white
         titleLabel.textAlignment = .center
+        titleLabel.lineBreakMode = .byWordWrapping
+        titleLabel.numberOfLines = 0
         
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(BookCell.self, forCellReuseIdentifier: BookCell.reuseIdentifier)
+        tableView.backgroundColor = .clear
+        tableView.separatorStyle = .none
         
         view.addSubview(titleLabel)
         view.addSubview(tableView)
         
         titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(20)
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(15)
             make.leading.trailing.equalToSuperview().inset(20)
         }
         
         tableView.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(20)
-            make.leading.trailing.bottom.equalToSuperview()
+            make.top.equalTo(titleLabel.snp.bottom).offset(30)
+            make.leading.trailing.equalToSuperview()
+            make.bottom.equalToSuperview().inset(30)
         }
     }
     
