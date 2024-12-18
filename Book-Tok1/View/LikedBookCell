@@ -1,7 +1,7 @@
 import UIKit
 import SnapKit
 
-class BookCell: UITableViewCell {
+class LikedBookCell: UITableViewCell {
     static let reuseIdentifier = "BookCell"
     private let bookImageView = UIImageView()
     private let titleLabel = UILabel()
