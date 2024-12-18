@@ -31,7 +31,7 @@ class LikedBooksViewController: UIViewController, UITableViewDataSource, UITable
         titleLabel.numberOfLines = 1
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.register(BookCell.self, forCellReuseIdentifier: BookCell.reuseIdentifier)
+        tableView.register(LikedBookCell.self, forCellReuseIdentifier: LikedBookCell.reuseIdentifier)
         tableView.separatorStyle = .none
         tableView.backgroundColor = .clear
     }
@@ -64,8 +64,8 @@ class LikedBooksViewController: UIViewController, UITableViewDataSource, UITable
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: BookCell.reuseIdentifier,
-                                                       for: indexPath) as? BookCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: LikedBookCell.reuseIdentifier,
+                                                       for: indexPath) as? LikedBookCell else {
             fatalError("Unable to dequeue BookCell")
         }
         let book = viewModel.likedBooks[indexPath.row]
