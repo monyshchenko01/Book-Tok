@@ -10,21 +10,18 @@ import UIKit
 import Combine
 
 final class BookTokViewModel {
-    private var bookSubject = CurrentValueSubject<Book?, Never>(nil)
+    var bookSubject = CurrentValueSubject<Book?, Never>(nil)
     private let bookImageSubject = CurrentValueSubject<UIImage?, Never>(nil)
-    private let isLikedSubject = CurrentValueSubject<Bool, Never>(false)
+    let isLikedSubject = CurrentValueSubject<Bool, Never>(false)
 
     private let bookAPIservice: BookAPIService
     var cancellables = Set<AnyCancellable>()
-    
     var bookPublisher: AnyPublisher<Book?, Never> {
         bookSubject.eraseToAnyPublisher()
     }
-    
     var bookImagePublisher: AnyPublisher<UIImage?, Never> {
         bookImageSubject.eraseToAnyPublisher()
     }
-    
     var isLikedPublished: AnyPublisher<Bool, Never> {
         isLikedSubject.eraseToAnyPublisher()
     }
@@ -32,7 +29,6 @@ final class BookTokViewModel {
     init(bookAPIservice: BookAPIService) {
         self.bookAPIservice = bookAPIservice
     }
-    
     func fetchRandomBook() {
         bookAPIservice.fetchRandomBook()
             .receive(on: DispatchQueue.main)
@@ -47,10 +43,8 @@ final class BookTokViewModel {
             }
             .store(in: &cancellables)
     }
-    
     func fetchCurrentBookCoverImage() {
         guard let coverUrl = bookSubject.value?.imageLinks?.thumbnail, let url = URL(string: coverUrl) else { return }
-       
         bookAPIservice.fetchImage(at: url)
            .receive(on: DispatchQueue.main)
            .sink(receiveCompletion: { [weak self] completion in
@@ -62,12 +56,14 @@ final class BookTokViewModel {
            })
            .store(in: &cancellables)
     }
-    
     private func findBook(_ book: Book) -> BookEntity? {
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            print("Failed to get AppDelegate")
+            return nil
+        }
+        let context = appDelegate.persistentContainer.viewContext
         let fetchRequest: NSFetchRequest<BookEntity> = BookEntity.fetchRequest()
         fetchRequest.predicate = NSPredicate(format: "title == %@", book.title)
-        
         do {
             let results = try context.fetch(fetchRequest)
             return results.first
@@ -75,12 +71,13 @@ final class BookTokViewModel {
             return nil
         }
     }
-    
     func updateLikedStatus() {
         guard let currentBook = bookSubject.value else { return }
-        
-        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            print("Failed to get AppDelegate")
+            return
+        }
+        let context = appDelegate.persistentContainer.viewContext
         if let existingBookEntity = findBook(currentBook) {
             context.delete(existingBookEntity)
             isLikedSubject.send(false)
@@ -91,27 +88,37 @@ final class BookTokViewModel {
             bookEntity.bookDescription = currentBook.description
             bookEntity.categories = currentBook.categories
             bookEntity.averageRating = currentBook.averageRating ?? 0.0
-            
             if let imageLinks = currentBook.imageLinks {
                 let imageLinksEntity = ImageLinksEntity(context: context)
                 imageLinksEntity.smallThumbnail = imageLinks.smallThumbnail
                 imageLinksEntity.thumbnail = imageLinks.thumbnail
                 bookEntity.imageLinks = imageLinksEntity
             }
-            
             isLikedSubject.send(true)
         }
-        
         do {
             try context.save()
         } catch {
             print("Failed to toggle liked status: \(error)")
         }
     }
-    
-    func getAuthor() -> String? {
+    func getAuthor() -> Author? {
         guard let currentBook = bookSubject.value else { return nil }
-        
-        return currentBook.authors?.first
+        if let authorName = currentBook.authors?.first {
+            return Author(name: authorName, biography: "", photoURL: nil, books: [])
+        }
+        return nil
+    }
+    func currentBookEntity() -> BookEntity? {
+        guard let currentBook = bookSubject.value else { return nil }
+        return findBook(currentBook)
+    }
+    func getContext() -> NSManagedObjectContext? {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            print("Failed to get AppDelegate")
+            return nil
+        }
+        return appDelegate.persistentContainer.viewContext
     }
 }
+
