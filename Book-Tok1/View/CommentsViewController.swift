@@ -1,9 +1,11 @@
 import UIKit
 import SnapKit
+import CoreData
 
 class CommentsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    private var viewModel = CommentsViewModel()
-
+    private var viewModel: CommentsViewModel!
+    var book: BookEntity?
+    var context: NSManagedObjectContext!
     private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CommentCell")
@@ -34,12 +36,17 @@ class CommentsViewController: UIViewController, UITableViewDataSource, UITableVi
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        tableView.dataSource = self
-        tableView.delegate = self
+        guard let book = book else {
+            print("Book is nil")
+            return
+        }
+        viewModel = CommentsViewModel(context: context)
         viewModel.updateUI = { [weak self] in
             self?.tableView.reloadData()
         }
-
+        viewModel.fetchComments(for: book)
+        tableView.dataSource = self
+        tableView.delegate = self
         submitButton.addTarget(self, action: #selector(addComment), for: .touchUpInside)
         setupView()
     }
@@ -99,14 +106,16 @@ class CommentsViewController: UIViewController, UITableViewDataSource, UITableVi
                                       preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
-            self.viewModel.deleteComment(at: indexPath.row)
+            guard let book = self.book else { return }
+            self.viewModel.deleteComment(at: indexPath.row, for: book)
         }))
         present(alert, animated: true, completion: nil)
     }
 
     @objc private func addComment() {
         guard let text = commentTextField.text, !text.isEmpty else { return }
-        viewModel.addComment(text)
+        guard let book = book else { return }
+        viewModel.addComment(text, to: book)
         commentTextField.text = ""
     }
 }
