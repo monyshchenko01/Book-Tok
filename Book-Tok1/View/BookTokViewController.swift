@@ -136,7 +136,9 @@ final class BookTokViewController: UIViewController {
             .sink { [weak self] book in
                 self?.view.layoutIfNeeded()
                 self?.setupGradient()
+                self?.buttonsStack.isHidden = true
                 if let book = book {
+                    self?.buttonsStack.isHidden = false
                     self?.bookInfoView.configure(with: book)
                     self?.authorButton.isHidden = book.authors?.isEmpty ?? true
                 }
