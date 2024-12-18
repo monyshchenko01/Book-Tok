@@ -20,7 +20,10 @@ class CommentsViewController: UIViewController, UITableViewDataSource, UITableVi
         textField.borderStyle = .roundedRect
         textField.layer.cornerRadius = 8
         textField.layer.borderWidth = 1
-        textField.layer.borderColor = UIColor.lightGray.cgColor
+        textField.layer.borderColor = UIColor.darkGray.cgColor
+        if let placeholderLabel = textField.value(forKey: "placeholderLabel") as? UILabel {
+            placeholderLabel.textColor = .gray
+        }
         return textField
     }()
 
@@ -60,6 +63,7 @@ class CommentsViewController: UIViewController, UITableViewDataSource, UITableVi
         }
 
         let inputContainer = UIView()
+        inputContainer.backgroundColor = .white
         view.addSubview(inputContainer)
 
         inputContainer.snp.makeConstraints {
@@ -94,9 +98,14 @@ class CommentsViewController: UIViewController, UITableViewDataSource, UITableVi
         cell.textLabel?.text = viewModel.comments[indexPath.row]
         cell.textLabel?.numberOfLines = 0
         cell.textLabel?.font = UIFont.systemFont(ofSize: 16)
+        cell.textLabel?.textColor = .black
         cell.backgroundColor = .white
         cell.layer.cornerRadius = 10
         cell.clipsToBounds = true
+        
+        let selectedBackgroundView = UIView()
+        selectedBackgroundView.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.2)
+        cell.selectedBackgroundView = selectedBackgroundView
         return cell
     }
 

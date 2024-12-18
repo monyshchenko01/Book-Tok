@@ -27,7 +27,7 @@ final class BookInfoView : UIView {
         categoryLabel.font = .systemFont(ofSize: 14, weight: .semibold)
         categoryLabel.textColor = .white
         categoryLabel.textAlignment = .center
-        categoryLabel.backgroundColor = .blue
+        categoryLabel.backgroundColor = .systemBlue
         categoryLabel.layer.cornerRadius = 15
         categoryLabel.layer.masksToBounds = true
         categoryLabel.numberOfLines = 1
