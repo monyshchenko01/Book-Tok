@@ -4,20 +4,14 @@
 //
 //  Created by Matvii Onyshchenko on 06.12.2024.
 //
-
 import UIKit
 import CoreData
 
-@UIApplicationMain
+@main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
-    func applicationWillTerminate(_ application: UIApplication) {
-        self.saveContext()
-    }
-    
     lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "BookData")
-        container.loadPersistentStores { _, error in
+        let container = NSPersistentContainer(name: "BooktokDataModel")
+        container.loadPersistentStores { storeDescription, error in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
@@ -25,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return container
     }()
     
-    func saveContext () {
+    func saveContext() {
         let context = persistentContainer.viewContext
         if context.hasChanges {
             do {
@@ -37,5 +31,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 }
-// Reference: https://github.com/mohammadalijf/CoreData-AppDelegate/blob/master/AppDelegate.swift
 

@@ -1,9 +1,11 @@
 import UIKit
 import SnapKit
+import CoreData
 
 class CommentsViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    var comments: [String] = []
-
+    private var viewModel: CommentsViewModel!
+    var book: BookEntity?
+    var context: NSManagedObjectContext!
     private let tableView: UITableView = {
         let tableView = UITableView()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CommentCell")
@@ -18,7 +20,10 @@ class CommentsViewController: UIViewController, UITableViewDataSource, UITableVi
         textField.borderStyle = .roundedRect
         textField.layer.cornerRadius = 8
         textField.layer.borderWidth = 1
-        textField.layer.borderColor = UIColor.lightGray.cgColor
+        textField.layer.borderColor = UIColor.darkGray.cgColor
+        if let placeholderLabel = textField.value(forKey: "placeholderLabel") as? UILabel {
+            placeholderLabel.textColor = .gray
+        }
         return textField
     }()
 
@@ -34,6 +39,15 @@ class CommentsViewController: UIViewController, UITableViewDataSource, UITableVi
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        guard let book = book else {
+            print("Book is nil")
+            return
+        }
+        viewModel = CommentsViewModel(context: context)
+        viewModel.updateUI = { [weak self] in
+            self?.tableView.reloadData()
+        }
+        viewModel.fetchComments(for: book)
         tableView.dataSource = self
         tableView.delegate = self
         submitButton.addTarget(self, action: #selector(addComment), for: .touchUpInside)
@@ -49,6 +63,7 @@ class CommentsViewController: UIViewController, UITableViewDataSource, UITableVi
         }
 
         let inputContainer = UIView()
+        inputContainer.backgroundColor = .white
         view.addSubview(inputContainer)
 
         inputContainer.snp.makeConstraints {
@@ -75,35 +90,41 @@ class CommentsViewController: UIViewController, UITableViewDataSource, UITableVi
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return comments.count
+        return viewModel.comments.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CommentCell", for: indexPath)
-        cell.textLabel?.text = comments[indexPath.row]
+        cell.textLabel?.text = viewModel.comments[indexPath.row]
         cell.textLabel?.numberOfLines = 0
         cell.textLabel?.font = UIFont.systemFont(ofSize: 16)
+        cell.textLabel?.textColor = .black
         cell.backgroundColor = .white
         cell.layer.cornerRadius = 10
         cell.clipsToBounds = true
+        
+        let selectedBackgroundView = UIView()
+        selectedBackgroundView.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.2)
+        cell.selectedBackgroundView = selectedBackgroundView
         return cell
     }
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let alert = UIAlertController(title: "Delete Comment",
                                       message: "Do you want to delete this comment?",
                                       preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
-            self.comments.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .automatic)
+            guard let book = self.book else { return }
+            self.viewModel.deleteComment(at: indexPath.row, for: book)
         }))
         present(alert, animated: true, completion: nil)
     }
 
     @objc private func addComment() {
         guard let text = commentTextField.text, !text.isEmpty else { return }
-        comments.append(text)
-        tableView.reloadData()
+        guard let book = book else { return }
+        viewModel.addComment(text, to: book)
         commentTextField.text = ""
     }
 }
